@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  dev-edms:
+    image: botech/dev-edms
+    build:
+      context: .
+      dockerfile: ./dev-edms.Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../:/home/mayan/src/botech-edms
+      - ../../../wo/mayan-edms/:/home/mayan/src/mayan-edms
+      # - logvolume01:/var/log
+  #   depends_on:
+  #     - redis
+  # redis:
+  #   image: redis
+# volumes:
+#   logvolume01: {}
