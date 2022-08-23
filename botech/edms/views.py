@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
+from mayan.apps.metadata.forms import DocumentMetadataFormSet
 from mayan.apps.views.generics import (
     ConfirmView, MultiFormView
 )
@@ -66,6 +67,10 @@ class AccountingDocumentEditView(MultiFormView):
       disappear from special inbox cabinets or similar.
 
     """
+
+    form_classes = {
+        'metadata': DocumentMetadataFormSet,
+    }
 
     # TODO: implement view
     pass
