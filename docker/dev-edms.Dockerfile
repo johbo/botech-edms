@@ -20,11 +20,26 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive \
         apt-get update \
     && apt-get install --no-install-recommends --yes \
-        sudo \
+        # TODO: make setup-dev-environment fails without ldap
+        libldap2-dev \
+        libsasl2-dev \
+        # ENDTODO make ...
+        make \
+        python3-pip \
         python3-venv \
+        sudo \
     && echo "mayan ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && sudo -u mayan mkdir /home/mayan/src /home/mayan/venv
 # TODO: Decide if purge of apt files should be done here
 
 USER mayan
 WORKDIR /home/mayan
+
+COPY --chown=mayan:mayan mayan-edms mayan-edms-make
+
+RUN set -x \
+    && DEBIAN_FRONTEND=noninteractive \
+    make -C mayan-edms-make setup-dev-operating-system-packages
+
+RUN \
+    make -C mayan-edms-make setup-dev-python-libraries
