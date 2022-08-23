@@ -9,11 +9,7 @@ LABEL org.opencontainers.image.authors="joh@bo-tech.de"
 COPY config.env /config.env
 
 ENV LC_ALL=C.UTF-8 \
-    PYTHONUNBUFFERED=1 \
-    PROJECT_INSTALL_DIR=/opt/mayan-edms/
-
-ENV MAYAN_MEDIA_ROOT=/var/lib/mayan \
-    MAYAN_STATIC_ROOT=${PROJECT_INSTALL_DIR}static
+    PYTHONUNBUFFERED=1
 
 RUN set -x \
     && adduser mayan \
@@ -43,6 +39,8 @@ RUN set -x \
 
 RUN \
     make -C mayan-edms-make setup-dev-python-libraries
+
+EXPOSE 8000
 
 # TODO: Dev installation of botech-edms currently still required manually
 #
