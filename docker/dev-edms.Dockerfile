@@ -43,3 +43,14 @@ RUN set -x \
 
 RUN \
     make -C mayan-edms-make setup-dev-python-libraries
+
+# TODO: Dev installation of botech-edms currently still required manually
+#
+# source ~/venv/bin/activate
+# cd ~/src/botech-edms
+# python setup.py develop
+# cd ~/src/mayan-edms
+# python setup.py develop
+#
+# Note: This is only required once, since the venv is persistent if a volume is
+# mounted on it.
