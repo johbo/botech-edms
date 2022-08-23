@@ -21,8 +21,9 @@ RUN set -x \
         apt-get update \
     && apt-get install --no-install-recommends --yes \
         sudo \
+        python3-venv \
     && echo "mayan ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers \
-    && sudo -u mayan mkdir /home/mayan/src
+    && sudo -u mayan mkdir /home/mayan/src /home/mayan/venv
 # TODO: Decide if purge of apt files should be done here
 
 USER mayan

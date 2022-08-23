@@ -10,6 +10,7 @@ services:
     volumes:
       - ../:/home/mayan/src/botech-edms
       - ../../../wo/mayan-edms/:/home/mayan/src/mayan-edms
+      - ../.venv/:/home/mayan/venv
       # - logvolume01:/var/log
   #   depends_on:
   #     - redis
