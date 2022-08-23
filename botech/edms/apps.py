@@ -8,6 +8,7 @@ from .links import link_my_simple_view
 
 class BotechEdmsConfig(MayanAppConfig):
     app_namespace = 'botech_edms'
+    app_url = 'botech'
     name = 'botech.edms'
 
     def ready(self):
