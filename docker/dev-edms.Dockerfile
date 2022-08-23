@@ -20,12 +20,11 @@ RUN set -x \
         libldap2-dev \
         libsasl2-dev \
         # ENDTODO make ...
-        file \
         make \
         python3-pip \
         python3-venv \
         sudo \
-        tesseract-ocr-deu\
+        tesseract-ocr-deu \
     # TODO: copy of the dockerfile from EDMS, consider to use their image as base
     && apt-get install --no-install-recommends --yes \
         ca-certificates \

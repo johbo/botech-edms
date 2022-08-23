@@ -40,6 +40,7 @@
   - [x] runserver in dev-env image
   - [x] botech-edms in dev-install included
   - [x] back to the display of the form data
+  - [ ] test initialize
 
 - [ ] store change on document on submit
 
