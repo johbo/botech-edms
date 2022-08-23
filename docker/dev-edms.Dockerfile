@@ -20,10 +20,45 @@ RUN set -x \
         libldap2-dev \
         libsasl2-dev \
         # ENDTODO make ...
+        file \
         make \
         python3-pip \
         python3-venv \
         sudo \
+        tesseract-ocr-deu\
+    # TODO: copy of the dockerfile from EDMS, consider to use their image as base
+    && apt-get install --no-install-recommends --yes \
+        ca-certificates \
+        exiftool \
+        file \
+        fonts-arphic-uming \
+        fonts-arphic-ukai \
+        fonts-unfonts-core \
+        fuse \
+        ghostscript \
+        git-core \
+        gpgv \
+        gnupg1 \
+        graphviz \
+        libarchive-zip-perl \
+        libfile-mimeinfo-perl \
+        libfuse2 \
+        libldap-2.4-2 \
+        libmagic1 \
+        libmariadb3 \
+        libpq5 \
+        libreoffice-calc-nogui \
+        libreoffice-draw-nogui \
+        libreoffice-impress-nogui \
+        libreoffice-math-nogui \
+        libreoffice-writer-nogui \
+        libsasl2-2 \
+        poppler-utils \
+        python3-distutils \
+        sane-utils \
+        sudo \
+        supervisor \
+        tesseract-ocr \
     && echo "mayan ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && sudo -u mayan mkdir /home/mayan/src /home/mayan/venv
 # TODO: Decide if purge of apt files should be done here
