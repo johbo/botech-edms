@@ -127,8 +127,7 @@ class AccountingDocumentEditView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        request = self.request
-        document = self.get_object()
+        document = self.object
 
         context.update({
             'title': _('Process Document for Accounting'),
@@ -142,6 +141,7 @@ class AccountingDocumentEditView(
                         'title': _('Accounting Metadata'),
                     },
                 },
+                # TODO: Further details about the document
                 # {
                 #     'name': 'appearance/generic_multiform_subtemplate.html',
                 #     'context': {
