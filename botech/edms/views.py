@@ -87,7 +87,7 @@ class AccountingDocumentEditView(
     object_permission = permission_document_edit
     pk_url_kwarg = 'document_id'
     source_queryset = Document.valid.all()
-    template_name = 'appearance/generic_form.html'
+    template_name = 'botech/appearance/generic_form_group.html'
 
     def dispatch(self, request, *args, **kwargs):
         # Note: SingleObjectMixin depends on this to render the context. Even
@@ -117,29 +117,21 @@ class AccountingDocumentEditView(
             'subtitle': document.label,
             'subtemplates_list': [
                 {
-                    'name': 'appearance/generic_form_subtemplate.html',
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
                     'context': {
                         'form': context['forms']['properties'],
-                        # 'form_display_mode_table': True,
                         'title': _('Document properties'),
                         'read_only': True,
                     },
                 },
                 {
-                    'name': 'appearance/generic_form_subtemplate.html',
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
                     'context': {
                         'form': context['forms']['metadata'],
                         'form_display_mode_table': True,
                         'title': _('Accounting metadata'),
                     },
                 },
-                # TODO: Further details about the document
-                # {
-                #     'name': 'appearance/generic_multiform_subtemplate.html',
-                #     'context': {
-                #         'forms': context['forms'],
-                #     },
-                # },
             ]
         })
         return context

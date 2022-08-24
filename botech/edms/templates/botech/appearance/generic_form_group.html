@@ -1,0 +1,56 @@
+{% extends 'appearance/base.html' %}
+
+{% load views_tags %}
+
+{% block title %}{% include 'appearance/partials/form_title.html' with non_html_title=True %}{% endblock %}
+
+{% block content %}
+  <div class="row">
+
+    {% if is_multipart %}
+        <form action="{{ form_action }}" class="{{ form_css_classes|default:'' }}" enctype="multipart/form-data" method="{{ submit_method|default:'post' }}" name="{{ form.prefix|default:'' }}" target="{{ submit_target|default:'_self' }}">
+    {% else %}
+        <form action="{{ form_action }}" class="{{ form_css_classes|default:'' }}" method="{{ submit_method|default:'post' }}" name="{{ form.prefix|default:'' }}" target="{{ submit_target|default:'_self' }}">
+    {% endif %}
+
+        {% if step_field %}
+            <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+        {% endif %}
+
+        {% if submit_method != 'GET' and submit_method != 'get' %}
+            {% csrf_token %}
+        {% endif %}
+
+        {% if next %}
+            <input name="next" type="hidden" value="{{ next }}" />
+        {% endif %}
+
+        {% if previous %}
+            <input name="previous" type="hidden" value="{{ previous }}" />
+        {% endif %}
+
+        {% for hidden_field in hidden_fields %}
+          {{ hidden_field.as_hidden }}
+        {% endfor %}
+
+
+
+
+
+    {% for subtemplate in subtemplates_list %}
+      {% if subtemplate.column_class %}
+        <div class="{{ subtemplate.column_class }}">
+      {% else %}
+        <div class="col-xs-12">
+      {% endif %}
+
+      {% views_render_subtemplate subtemplate.name subtemplate.context as rendered_subtemplate %}
+      {{ rendered_subtemplate }}
+        </div>
+    {% endfor %}
+
+
+    </form>
+
+  </div>
+{% endblock %}
