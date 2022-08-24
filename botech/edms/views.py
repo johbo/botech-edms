@@ -202,8 +202,6 @@ class AccountingDocumentEditView(
         metadata_queryset = self._get_accounting_metadata()
         document = self.object
 
-        # TODO: This is a copy from matadata.document_views, check if
-        # redundancy in code can be avoided somehow.
         errors = []
         for form in form.forms:
             if form.cleaned_data['update']:
