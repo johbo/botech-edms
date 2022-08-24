@@ -122,9 +122,12 @@ class AccountingDocumentEditView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         request = self.request
+        # TODO: Fix this, fail if more than one object
+        document = self.get_object_list()[0]
 
         context.update({
             'title': _('Process Document for Accounting'),
+            'subtitle': document.label,
             'subtemplates_list': [
                 {
                     'name': 'appearance/generic_form_subtemplate.html',
