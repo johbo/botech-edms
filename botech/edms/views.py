@@ -107,12 +107,14 @@ class AccountingDocumentEditView(
         request = self.request
 
         context.update({
+            'title': _('Process Document for Accounting'),
             'subtemplates_list': [
                 {
                     'name': 'appearance/generic_form_subtemplate.html',
                     'context': {
                         'form': context['forms']['metadata'],
                         'form_display_mode_table': True,
+                        'title': _('Accounting Metadata'),
                     },
                 },
                 # {
