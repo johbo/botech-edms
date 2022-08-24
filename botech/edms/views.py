@@ -4,6 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from mayan.apps.acls.models import AccessControlList
 from mayan.apps.documents.models import Document
+from mayan.apps.documents.forms.document_forms import DocumentForm, DocumentPropertiesForm
+from mayan.apps.documents.forms.document_type_forms import DocumentTypeFilteredSelectForm
 from mayan.apps.metadata.forms import DocumentMetadataFormSet
 from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
@@ -81,9 +83,13 @@ class AccountingDocumentEditView(
 
     form_classes = {
         'metadata': DocumentMetadataFormSet,
+        'properties': DocumentForm,
+        'doc_type': DocumentTypeFilteredSelectForm,
     }
     prefixes = {
         'metadata': 'metadata',
+        'properties': 'properties',
+        'doc_type': 'doc_type',
     }
 
     # This is the parameter name used from the URL configuration
@@ -118,6 +124,13 @@ class AccountingDocumentEditView(
             ]
         })
         return context
+
+    def get_form_extra_kwargs__properties(self):
+        # TODO: Fix this, fail if more than one object
+        document = self.get_object_list()[0]
+        return {
+            'document_type': document.document_type,
+        }
 
     def get_initial__metadata(self):
         queryset = self.object_list
