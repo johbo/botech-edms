@@ -46,11 +46,20 @@
   - [x] back to the display of the form data
   - [x] test initialize
 
-- [ ] create metadata configuration in dev system. test terraform provider.
-
 - [ ] store change on document metadata on submit
+  - [x] hide other forms
+  - [x] form display mode parameter into context
+  - [x] add second metadata field
+  - [ ] store data
+  - [ ] handle issues
+
+- [ ] fix up style of metadata display. Should look like the other places.
 
 - [ ] display actual data in the forms
+
+- [ ] success and failure message into view
+
+- [ ] Cancel Button
 
 - [ ] show a preview of the document
 
@@ -61,3 +70,5 @@
 - [ ] tag on submit
 
 - [ ] require acct_doc_number on submit
+
+- [ ] create metadata configuration in dev system. test terraform provider.

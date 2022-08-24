@@ -83,7 +83,7 @@ class AccountingDocumentEditView(
 
     form_classes = {
         'metadata': DocumentMetadataFormSet,
-        'properties': DocumentForm,
+        # 'properties': DocumentForm,
         'doc_type': DocumentTypeFilteredSelectForm,
     }
     prefixes = {
@@ -109,18 +109,18 @@ class AccountingDocumentEditView(
         context.update({
             'subtemplates_list': [
                 {
-                    'name': 'appearance/generic_multiform_subtemplate.html',
+                    'name': 'appearance/generic_form_subtemplate.html',
                     'context': {
-                        'forms': context['forms'],
-                        'is_multipart': True,
-                        'form_action': '{}?{}'.format(
-                            reverse(
-                                viewname=request.resolver_match.view_name,
-                                kwargs=request.resolver_match.kwargs
-                            ), request.META['QUERY_STRING']
-                        ),
+                        'form': context['forms']['metadata'],
+                        'form_display_mode_table': True,
                     },
-                }
+                },
+                # {
+                #     'name': 'appearance/generic_multiform_subtemplate.html',
+                #     'context': {
+                #         'forms': context['forms'],
+                #     },
+                # },
             ]
         })
         return context
