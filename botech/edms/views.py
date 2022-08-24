@@ -221,11 +221,7 @@ class AccountingDocumentEditView(
                             raise
 
         for error in errors:
-            # TODO: refactor, exception_message(error) and put the details away
-            if isinstance(error, ValidationError):
-                exception_message = ', '.join(error.messages)
-            else:
-                exception_message = force_text(s=error)
+            exception_message = _exception_to_message(error)
 
             messages.error(
                 message=_(
@@ -259,3 +255,13 @@ class AccountingDocumentEditView(
         # TODO: Restrict this to only the accounting related metadata instances
 
         return metadata
+
+
+def _exception_to_message(error):
+    """
+    Transform a given exception to a message.
+    """
+    if isinstance(error, ValidationError):
+        exception_message = ', '.join(error.messages)
+    else:
+        exception_message = force_text(s=error)
