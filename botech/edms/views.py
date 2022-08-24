@@ -75,7 +75,7 @@ class AccountingDocumentEditView(
 
     form_classes = {
         'metadata': DocumentMetadataFormSet,
-        # 'properties': DocumentForm,
+        'properties': DocumentPropertiesForm,
         # 'doc_type': DocumentTypeFilteredSelectForm,
     }
     prefixes = {
@@ -119,9 +119,18 @@ class AccountingDocumentEditView(
                 {
                     'name': 'appearance/generic_form_subtemplate.html',
                     'context': {
+                        'form': context['forms']['properties'],
+                        # 'form_display_mode_table': True,
+                        'title': _('Document properties'),
+                        'read_only': True,
+                    },
+                },
+                {
+                    'name': 'appearance/generic_form_subtemplate.html',
+                    'context': {
                         'form': context['forms']['metadata'],
                         'form_display_mode_table': True,
-                        'title': _('Accounting Metadata'),
+                        'title': _('Accounting metadata'),
                     },
                 },
                 # TODO: Further details about the document
@@ -135,12 +144,10 @@ class AccountingDocumentEditView(
         })
         return context
 
-    # TODO: Check if this method is still required once the document properties
-    # are shown
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
         return {
-            'document_type': document.document_type,
+            'instance': document,
         }
 
     def get_initial__metadata(self):
