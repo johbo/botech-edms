@@ -1,10 +1,17 @@
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
+from mayan.apps.acls.models import AccessControlList
+from mayan.apps.documents.models import Document
 from mayan.apps.metadata.forms import DocumentMetadataFormSet
+from mayan.apps.metadata.permissions import (
+    permission_document_metadata_edit,
+    permission_document_metadata_remove)
+from mayan.apps.views.mixins import (
+    MultipleObjectViewMixin, RestrictedQuerysetViewMixin)
 from mayan.apps.views.generics import (
-    ConfirmView, MultiFormView
+    ConfirmView, MultiFormView, MultipleObjectFormActionView
 )
 
 class MySimpleView(ConfirmView):
@@ -25,7 +32,11 @@ class MySimpleView(ConfirmView):
         )
 
 
-class AccountingDocumentEditView(MultiFormView):
+class AccountingDocumentEditView(
+        MultipleObjectViewMixin,
+        # TODO: Does not seem to work as expected, still requires queryset to be there
+        # RestrictedQuerysetViewMixin,
+        MultiFormView):
     """Specialized view to support the accounting workflow.
 
     This view shows the relevant aspects of a document which are required when
@@ -71,6 +82,71 @@ class AccountingDocumentEditView(MultiFormView):
     form_classes = {
         'metadata': DocumentMetadataFormSet,
     }
+    prefixes = {
+        'metadata': 'metadata',
+    }
 
-    # TODO: implement view
-    pass
+    # This is the parameter name used from the URL configuration
+    pk_url_kwarg = 'document_id'
+
+    object_permission = None
+    source_queryset = Document.valid.all()
+    # TODO: restrict to permissions
+    queryset = source_queryset
+
+    template_name = 'appearance/generic_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request = self.request
+
+        context.update({
+            'subtemplates_list': [
+                {
+                    'name': 'appearance/generic_multiform_subtemplate.html',
+                    'context': {
+                        'forms': context['forms'],
+                        'is_multipart': True,
+                        'form_action': '{}?{}'.format(
+                            reverse(
+                                viewname=request.resolver_match.view_name,
+                                kwargs=request.resolver_match.kwargs
+                            ), request.META['QUERY_STRING']
+                        ),
+                    },
+                }
+            ]
+        })
+        return context
+
+    def get_initial__metadata(self):
+        queryset = self.object_list
+
+        metadata = {}
+        for document in queryset:
+            document_metadata_queryset = AccessControlList.objects.restrict_queryset(
+                queryset=document.metadata.all(),
+                permission=permission_document_metadata_remove,
+                user=self.request.user
+            )
+
+            for document_metadata in document_metadata_queryset:
+                # Metadata value cannot be None here, fallback to an empty
+                # string
+                value = document_metadata.value or ''
+                if document_metadata.metadata_type in metadata:
+                    if value not in metadata[document_metadata.metadata_type]:
+                        metadata[document_metadata.metadata_type].append(value)
+                else:
+                    metadata[document_metadata.metadata_type] = [value] if value else ''
+
+        initial = []
+        for key, value in metadata.items():
+            initial.append(
+                {
+                    'document_type': queryset.first().document_type,
+                    'metadata_type': key,
+                    'value': ', '.join(value)
+                }
+            )
+        return initial

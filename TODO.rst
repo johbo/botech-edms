@@ -22,6 +22,8 @@
     had no access into the relevant request context information.
   - [ ] Display MetaDataForm - this failed, tricky to debug in the current
     setup, doing a proper dev setup on the local machine. Then back to this one.
+    - [x] parameter "subtemplates_list" in template context missing. This is the
+      reason why nothing is visible.
 
 - [ ] dev env setup
   - [x] study manual to find the guide
