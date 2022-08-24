@@ -152,6 +152,8 @@ class AccountingDocumentEditView(
         })
         return context
 
+    # TODO: Check if this method is still required once the document properties
+    # are shown
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
         return {
@@ -159,14 +161,14 @@ class AccountingDocumentEditView(
         }
 
     def get_initial__metadata(self):
-        document = self.get_object()
-
-        metadata = {}
+        document = self.object
         document_metadata_queryset = AccessControlList.objects.restrict_queryset(
             queryset=document.metadata.all(),
             permission=permission_document_metadata_remove,
             user=self.request.user
         )
+
+        metadata = {}
 
         for document_metadata in document_metadata_queryset:
 
