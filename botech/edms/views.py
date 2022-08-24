@@ -175,5 +175,19 @@ class AccountingDocumentEditView(
 
 
     def all_forms_valid(self, forms):
-        # TODO: Continue here!
+        """
+        Update objects based on valid form data.
+        """
+
+        self.form_valid_metadata(forms['metadata'])
+
+
+    def form_valid_metadata(self, form):
+        # TODO: Fix this, fail if more than one object
+        document = self.get_object_list()[0]
+        document_metadata_queryset = AccessControlList.objects.restrict_queryset(
+            queryset=document.metadata.all(),
+            permission=permission_document_metadata_edit,
+            user=self.request.user
+        )
         raise NotImplementedError()
