@@ -148,6 +148,11 @@ class AccountingDocumentEditView(
             )
 
             for document_metadata in document_metadata_queryset:
+
+                # TODO: Apply a filter here to only list Accounting relevant
+                # Metadata. The same filter should be applied when writing data
+                # back into the objects.
+
                 # Metadata value cannot be None here, fallback to an empty
                 # string
                 value = document_metadata.value or ''
