@@ -11,7 +11,8 @@ from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
     permission_document_metadata_remove)
 from mayan.apps.views.mixins import (
-    MultipleObjectViewMixin, RestrictedQuerysetViewMixin)
+    MultipleObjectViewMixin, RestrictedQuerysetViewMixin,
+    RedirectionViewMixin)
 from mayan.apps.views.generics import (
     ConfirmView, MultiFormView, MultipleObjectFormActionView
 )
@@ -38,7 +39,8 @@ class AccountingDocumentEditView(
         MultipleObjectViewMixin,
         # TODO: Does not seem to work as expected, still requires queryset to be there
         # RestrictedQuerysetViewMixin,
-        MultiFormView):
+        MultiFormView,
+        RedirectionViewMixin):
     """Specialized view to support the accounting workflow.
 
     This view shows the relevant aspects of a document which are required when
@@ -84,7 +86,7 @@ class AccountingDocumentEditView(
     form_classes = {
         'metadata': DocumentMetadataFormSet,
         # 'properties': DocumentForm,
-        'doc_type': DocumentTypeFilteredSelectForm,
+        # 'doc_type': DocumentTypeFilteredSelectForm,
     }
     prefixes = {
         'metadata': 'metadata',
@@ -165,3 +167,8 @@ class AccountingDocumentEditView(
                 }
             )
         return initial
+
+
+    def all_forms_valid(self, forms):
+        # TODO: Continue here!
+        raise NotImplementedError()

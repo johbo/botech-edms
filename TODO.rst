@@ -51,9 +51,20 @@
   - [x] form display mode parameter into context
   - [x] add second metadata field
   - [ ] store data
+
+    def form_valid(self, form):
+        self.view_action(form=form)
+        return super().form_valid(form=form)
+
+    have to implement "all_forms_valid" or better "form_valid__FORMNAME"
+
+    ! second form seems to have a bug in the implementation, use first variant!
+
   - [ ] handle issues
 
 - [ ] fix up style of metadata display. Should look like the other places.
+
+- [ ] actions and sub-navigation missing in display of the form
 
 - [ ] display actual data in the forms
 
