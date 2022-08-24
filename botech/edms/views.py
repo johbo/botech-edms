@@ -200,6 +200,7 @@ class AccountingDocumentEditView(
 
     def form_valid_metadata(self, form):
         metadata_queryset = self._get_accounting_metadata()
+        document = self.object
 
         # TODO: This is a copy from matadata.document_views, check if
         # redundancy in code can be avoided somehow.
@@ -219,7 +220,6 @@ class AccountingDocumentEditView(
                         if settings.DEBUG or settings.TESTING:
                             raise
 
-        document = self.object
         for error in errors:
             # TODO: refactor, exception_message(error) and put the details away
             if isinstance(error, ValidationError):
