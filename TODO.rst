@@ -46,11 +46,11 @@
   - [x] back to the display of the form data
   - [x] test initialize
 
-- [ ] store change on document metadata on submit
+- [x] store change on document metadata on submit
   - [x] hide other forms
   - [x] form display mode parameter into context
   - [x] add second metadata field
-  - [ ] store data
+  - [x] store data
 
     def form_valid(self, form):
         self.view_action(form=form)
@@ -60,26 +60,88 @@
 
     ! second form seems to have a bug in the implementation, use first variant!
 
-  - [ ] handle issues
+  - [x] handle issues
+    This did work out of the box.
 
-- [ ] fix up style of metadata display. Should look like the other places.
+- [x] fix up style of metadata display. Should look like the other places.
+  Parameter in the context for tabular display.
 
-- [ ] actions and sub-navigation missing in display of the form
+- [x] success and failure message into view
 
-- [ ] display actual data in the forms
+- [x] Cancel Button
+  Did appear automatically
 
-- [ ] success and failure message into view
+- [x] actions and sub-navigation missing in display of the form
 
-- [ ] Cancel Button
+  Note: This may actually be an advantage, still, should find out why this is
+  and how this can be influenced.
+
+  It became visible once I did change the view to the single object view. This
+  also does make sense since the sub navigation is related to a specific
+  document. A view which would allow to handle multiple documents could not
+  reasonably show this many.
+
+- [x] display actual data in the forms
 
 - [ ] show a preview of the document
 
 - [ ] show a comment field
 
 - [ ] show document type
+  - [x] Use the properties display
+  - [x] research django forms, multiple forms in one post
+
+    Django does use the "prefix" so that multiple forms can be put into one
+    "FORM" tag.
+
+    Now it's a matter of the right templates. Might be that custom adaptions are
+    needed to the EDMS templates.
+  - [ ] Verify templates
+
+    "generic_form" is the entry point. It can dispatch to "form_subtemplate" if
+    a single form is in the context. And it can dispatch into a list of
+    "subtemplates".
+
+    "generic_form_instance" does render the inner things inside a FORM tag.
+
+    "generic_form_subtemplate" does render the FORM tag and then dispatch into
+    "form_instance".
+
+    "generic_multiform_subtemplate" does render the FORM tag and then iterate
+    over "forms". Per form it does dispatch to "form_instance".
+
+    Conclusions:
+
+    - generic form subtemplate without FORM tag
+    - generic form which wraps subtemplates in FORM tag
+    - one set of submit / cancel buttons in generic template
+
+
+  - [ ] render form into one multi form
+  - [ ] Adapt form, show type, date and optional description
+  - [ ] Allow to update the type (?) Could also be via action with link back to
+        the same page.
 
 - [ ] tag on submit
+  - [ ] tag handling
+    - if already tagged, show at least a warning
+    - what happens if already tagged and the form is submitted
 
 - [ ] require acct_doc_number on submit
 
 - [ ] create metadata configuration in dev system. test terraform provider.
+
+- [ ] install ipdb into dev environment container
+
+- [ ] Allow to add metadata items which are not yet in the database.
+
+  E.g. document number may not yet be set, the form should always show it and
+  instead of only updating if it does already exist in the database, it should
+  create a new item.
+
+- [ ] refactor
+
+        # TODO: This is a copy from matadata.document_views, check if
+        # redundancy in code can be avoided somehow.
+
+- [ ] Menu Entry "Accounting" for documents in sub navigation would be nice.
