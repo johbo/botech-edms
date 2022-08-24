@@ -162,20 +162,10 @@ class AccountingDocumentEditView(
 
     def get_initial__metadata(self):
         document = self.object
-        document_metadata_queryset = AccessControlList.objects.restrict_queryset(
-            queryset=document.metadata.all(),
-            permission=permission_document_metadata_remove,
-            user=self.request.user
-        )
-
+        metadata_queryset = self._get_accounting_metadata()
         metadata = {}
 
-        for document_metadata in document_metadata_queryset:
-
-            # TODO: Apply a filter here to only list Accounting relevant
-            # Metadata. The same filter should be applied when writing data
-            # back into the objects.
-
+        for document_metadata in metadata_queryset:
             # Metadata value cannot be None here, fallback to an empty
             # string
             value = document_metadata.value or ''
@@ -200,26 +190,23 @@ class AccountingDocumentEditView(
     def all_forms_valid(self, forms):
         """
         Update objects based on valid form data.
+
+        This method does delegate to specialized methods per sub-form which
+        does allow to change values.
         """
 
         self.form_valid_metadata(forms['metadata'])
 
 
     def form_valid_metadata(self, form):
-        document = self.get_object()
-        document_metadata_queryset = AccessControlList.objects.restrict_queryset(
-            queryset=document.metadata.all(),
-            permission=permission_document_metadata_edit,
-            user=self.request.user
-        )
-        # TODO: Restrict this to only the accounting related metadata instances
+        metadata_queryset = self._get_accounting_metadata()
 
         # TODO: This is a copy from matadata.document_views, check if
         # redundancy in code can be avoided somehow.
         errors = []
         for form in form.forms:
             if form.cleaned_data['update']:
-                if document_metadata_queryset.filter(
+                if metadata_queryset.filter(
                         metadata_type=form.cleaned_data['metadata_type_id']).exists():
                     try:
                         save_metadata_list(
@@ -232,6 +219,7 @@ class AccountingDocumentEditView(
                         if settings.DEBUG or settings.TESTING:
                             raise
 
+        document = self.object
         for error in errors:
             # TODO: refactor, exception_message(error) and put the details away
             if isinstance(error, ValidationError):
@@ -254,3 +242,20 @@ class AccountingDocumentEditView(
                     'Metadata for document %s edited successfully.'
                 ) % document, request=self.request
             )
+
+    def _get_accounting_metadata(self):
+        """
+        Create a QuerySet with the Accounting related Metadata of this document.
+        """
+        document = self.object
+        user = self.request.user
+
+        metadata = AccessControlList.objects.restrict_queryset(
+            queryset=document.metadata.all(),
+            permission=permission_document_metadata_edit,
+            user=user
+        )
+
+        # TODO: Restrict this to only the accounting related metadata instances
+
+        return metadata
