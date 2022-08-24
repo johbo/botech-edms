@@ -113,16 +113,17 @@ class AccountingDocumentEditView(
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        # TODO: Currently the View allows to be used for multiple objects, here
-        # we assume to have one specific document. This needs a slight
-        # refactoring, probably to restrict the view to one single document.
-        pk = self.kwargs.get(self.pk_url_kwarg)
+        document_id = self._get_document_id_from_request()
 
         return reverse(
             viewname='documents:document_preview', kwargs={
-                'document_id': pk,
+                'document_id': document_id,
             }
         )
+
+    def _get_document_id_from_request(self):
+        document_id = self.kwargs.get(self.pk_url_kwarg)
+        return document_id
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
