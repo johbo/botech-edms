@@ -101,11 +101,9 @@ class AccountingDocumentEditView(
         'doc_type': 'doc_type',
     }
 
-    pk_url_kwarg = 'document_id'
-
     object_permission = permission_document_edit
+    pk_url_kwarg = 'document_id'
     source_queryset = Document.valid.all()
-
     template_name = 'appearance/generic_form.html'
 
     def dispatch(self, request, *args, **kwargs):
