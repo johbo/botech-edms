@@ -3,18 +3,22 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic.detail import SingleObjectMixin
 
 from mayan.apps.acls.models import AccessControlList
 from mayan.apps.documents.models import Document
 from mayan.apps.documents.forms.document_forms import DocumentForm, DocumentPropertiesForm
 from mayan.apps.documents.forms.document_type_forms import DocumentTypeFilteredSelectForm
+from mayan.apps.documents.permissions import (
+    permission_document_edit)
 from mayan.apps.metadata.api import save_metadata_list
 from mayan.apps.metadata.forms import DocumentMetadataFormSet
 from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
     permission_document_metadata_remove)
 from mayan.apps.views.mixins import (
-    MultipleObjectViewMixin, RestrictedQuerysetViewMixin,
+    MultipleObjectViewMixin,
+    RestrictedQuerysetViewMixin,
     RedirectionViewMixin)
 from mayan.apps.views.generics import (
     ConfirmView, MultiFormView, MultipleObjectFormActionView
@@ -39,12 +43,12 @@ class MySimpleView(ConfirmView):
 
 
 class AccountingDocumentEditView(
-        MultipleObjectViewMixin,
-        # TODO: Does not seem to work as expected, still requires queryset to be there
-        # RestrictedQuerysetViewMixin,
+        RestrictedQuerysetViewMixin,
+        SingleObjectMixin,
         RedirectionViewMixin,
         MultiFormView):
-    """Specialized view to support the accounting workflow.
+    """
+    Specialized view to support the accounting workflow.
 
     This view shows the relevant aspects of a document which are required when
     adding the document to the accounting system:
@@ -97,15 +101,18 @@ class AccountingDocumentEditView(
         'doc_type': 'doc_type',
     }
 
-    # This is the parameter name used from the URL configuration
     pk_url_kwarg = 'document_id'
 
-    object_permission = None
+    object_permission = permission_document_edit
     source_queryset = Document.valid.all()
-    # TODO: restrict to permissions
-    queryset = source_queryset
 
     template_name = 'appearance/generic_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Note: SingleObjectMixin depends on this to render the context. Even
+        # though it does define "get_object()", it is not using it.
+        self.object = self.get_object()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         # TODO: Currently the View allows to be used for multiple objects, here
@@ -122,8 +129,7 @@ class AccountingDocumentEditView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         request = self.request
-        # TODO: Fix this, fail if more than one object
-        document = self.get_object_list()[0]
+        document = self.get_object()
 
         context.update({
             'title': _('Process Document for Accounting'),
@@ -148,43 +154,41 @@ class AccountingDocumentEditView(
         return context
 
     def get_form_extra_kwargs__properties(self):
-        # TODO: Fix this, fail if more than one object
-        document = self.get_object_list()[0]
+        document = self.get_object()
         return {
             'document_type': document.document_type,
         }
 
     def get_initial__metadata(self):
-        queryset = self.object_list
+        document = self.get_object()
 
         metadata = {}
-        for document in queryset:
-            document_metadata_queryset = AccessControlList.objects.restrict_queryset(
-                queryset=document.metadata.all(),
-                permission=permission_document_metadata_remove,
-                user=self.request.user
-            )
+        document_metadata_queryset = AccessControlList.objects.restrict_queryset(
+            queryset=document.metadata.all(),
+            permission=permission_document_metadata_remove,
+            user=self.request.user
+        )
 
-            for document_metadata in document_metadata_queryset:
+        for document_metadata in document_metadata_queryset:
 
-                # TODO: Apply a filter here to only list Accounting relevant
-                # Metadata. The same filter should be applied when writing data
-                # back into the objects.
+            # TODO: Apply a filter here to only list Accounting relevant
+            # Metadata. The same filter should be applied when writing data
+            # back into the objects.
 
-                # Metadata value cannot be None here, fallback to an empty
-                # string
-                value = document_metadata.value or ''
-                if document_metadata.metadata_type in metadata:
-                    if value not in metadata[document_metadata.metadata_type]:
-                        metadata[document_metadata.metadata_type].append(value)
-                else:
-                    metadata[document_metadata.metadata_type] = [value] if value else ''
+            # Metadata value cannot be None here, fallback to an empty
+            # string
+            value = document_metadata.value or ''
+            if document_metadata.metadata_type in metadata:
+                if value not in metadata[document_metadata.metadata_type]:
+                    metadata[document_metadata.metadata_type].append(value)
+            else:
+                metadata[document_metadata.metadata_type] = [value] if value else ''
 
         initial = []
         for key, value in metadata.items():
             initial.append(
                 {
-                    'document_type': queryset.first().document_type,
+                    'document_type': document.document_type,
                     'metadata_type': key,
                     'value': ', '.join(value)
                 }
@@ -201,8 +205,7 @@ class AccountingDocumentEditView(
 
 
     def form_valid_metadata(self, form):
-        # TODO: Fix this, fail if more than one object
-        document = self.get_object_list()[0]
+        document = self.get_object()
         document_metadata_queryset = AccessControlList.objects.restrict_queryset(
             queryset=document.metadata.all(),
             permission=permission_document_metadata_edit,
