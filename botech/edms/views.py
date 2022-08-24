@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -6,6 +8,7 @@ from mayan.apps.acls.models import AccessControlList
 from mayan.apps.documents.models import Document
 from mayan.apps.documents.forms.document_forms import DocumentForm, DocumentPropertiesForm
 from mayan.apps.documents.forms.document_type_forms import DocumentTypeFilteredSelectForm
+from mayan.apps.metadata.api import save_metadata_list
 from mayan.apps.metadata.forms import DocumentMetadataFormSet
 from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
@@ -39,8 +42,8 @@ class AccountingDocumentEditView(
         MultipleObjectViewMixin,
         # TODO: Does not seem to work as expected, still requires queryset to be there
         # RestrictedQuerysetViewMixin,
-        MultiFormView,
-        RedirectionViewMixin):
+        RedirectionViewMixin,
+        MultiFormView):
     """Specialized view to support the accounting workflow.
 
     This view shows the relevant aspects of a document which are required when
@@ -103,6 +106,18 @@ class AccountingDocumentEditView(
     queryset = source_queryset
 
     template_name = 'appearance/generic_form.html'
+
+    def get_success_url(self):
+        # TODO: Currently the View allows to be used for multiple objects, here
+        # we assume to have one specific document. This needs a slight
+        # refactoring, probably to restrict the view to one single document.
+        pk = self.kwargs.get(self.pk_url_kwarg)
+
+        return reverse(
+            viewname='documents:document_preview', kwargs={
+                'document_id': pk,
+            }
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -190,4 +205,45 @@ class AccountingDocumentEditView(
             permission=permission_document_metadata_edit,
             user=self.request.user
         )
-        raise NotImplementedError()
+        # TODO: Restrict this to only the accounting related metadata instances
+
+        # TODO: This is a copy from matadata.document_views, check if
+        # redundancy in code can be avoided somehow.
+        errors = []
+        for form in form.forms:
+            if form.cleaned_data['update']:
+                if document_metadata_queryset.filter(
+                        metadata_type=form.cleaned_data['metadata_type_id']).exists():
+                    try:
+                        save_metadata_list(
+                            metadata_list=[form.cleaned_data], document=document,
+                            _user=self.request.user
+                        )
+                    except Exception as exception:
+                        errors.append(exception)
+
+                        if settings.DEBUG or settings.TESTING:
+                            raise
+
+        for error in errors:
+            # TODO: refactor, exception_message(error) and put the details away
+            if isinstance(error, ValidationError):
+                exception_message = ', '.join(error.messages)
+            else:
+                exception_message = force_text(s=error)
+
+            messages.error(
+                message=_(
+                    'Error editing metadata for document: '
+                    '%(document)s; %(exception)s.'
+                ) % {
+                    'document': document,
+                    'exception': exception_message
+                }, request=self.request
+            )
+        else:
+            messages.success(
+                message=_(
+                    'Metadata for document %s edited successfully.'
+                ) % document, request=self.request
+            )
