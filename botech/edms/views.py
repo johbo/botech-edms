@@ -367,6 +367,7 @@ class AccountingDocumentEditView(
     def tag_document_as_booked(self):
         document = self.object
         booked_tag = self._get_booked_tag()
+        booked_tag._event_actor = self.request.user
         booked_tag.attach_to(document)
 
         messages.success(
