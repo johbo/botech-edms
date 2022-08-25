@@ -14,6 +14,7 @@ from mayan.apps.documents.permissions import (
 from mayan.apps.document_comments.models import Comment
 from mayan.apps.metadata.api import save_metadata_list
 from mayan.apps.metadata.forms import DocumentMetadataFormSet
+from mayan.apps.metadata.models import DocumentMetadata, MetadataType
 from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
     permission_document_metadata_remove)
@@ -101,6 +102,12 @@ class AccountingDocumentEditView(
         # Note: SingleObjectMixin depends on this to render the context. Even
         # though it does define "get_object()", it is not using it.
         self.object = self.get_object()
+
+        # TODO: Find a better place. This view shall not be usable if the
+        # document number has already been set. Should be a generic check if
+        # entry into this view is allowed.
+        self._ensure_no_acct_doc_number()
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -266,15 +273,47 @@ class AccountingDocumentEditView(
             )
 
     def form_valid_comment(self, form):
+        acct_doc_number = form.cleaned_data['doc_number']
+        self._set_acct_doc_number(acct_doc_number)
+
+        comment_text = form.cleaned_data['text']
+        self._add_comment_if_provided(comment_text)
+
+    def _set_acct_doc_number(self, acct_doc_number):
+        self._ensure_no_acct_doc_number()
+
         document = self.object
-        text = form.cleaned_data['text']
-        if not text:
+        metadata_type = MetadataType.objects.get(
+            name='acct_doc_number')
+
+        document_metadata = DocumentMetadata(
+            document=document,
+            metadata_type=metadata_type,
+            value=acct_doc_number)
+        document_metadata._event_actor = self.request.user
+        document_metadata.save()
+
+    def _ensure_no_acct_doc_number(self):
+        metadata_type = MetadataType.objects.get(
+            name='acct_doc_number')
+        document = self.object
+
+        document_metadata = DocumentMetadata.objects.filter(
+            metadata_type=metadata_type,
+            document=document)
+        if document_metadata.exists():
+            raise NotImplementedError('Handling for this case is not yet implemented')
+
+
+    def _add_comment_if_provided(self, comment_text):
+        document = self.object
+        if not comment_text:
             return
 
         comment = Comment(
             document = document,
             user = self.request.user,
-            text = text)
+            text = comment_text)
         comment.save()
         messages.success(
             message=_(

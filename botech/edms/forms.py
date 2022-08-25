@@ -8,3 +8,7 @@ class CommentForm(forms.Form):
         label=_('Comment'),
         required=False,
         widget=forms.Textarea)
+
+    doc_number = forms.CharField(
+        label=_('ACCT Document Number'),
+        required=True)
