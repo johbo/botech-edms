@@ -3,13 +3,54 @@
  TODO
 ======
 
-- [ ] docker image
-  - [ ] build a custom image which does contain this codebase
+- [ ] docker image which contains the botech package
+  - [x] put repository into Github -> easy download
+  - [x] adapt docker file to install the python package
+  - [x] push to imac via terraform as test-edms
+  - [x] adapt settings
+    So far only the following line was needed:
+    "MAYAN_COMMON_EXTRA_APPS={botech.edms}",
+  - [x] test
+    Need one round of tweaks before using this.
+  - [ ] test again after tweaking
+  - [ ] update both edms systems
+  - [ ] app only active in the botech system, not in the private one
+
+- [ ] Add documentation as a Sphinx based document
+
+- [ ] Add event into the audit log about usage of accounting view
+- [ ] Tag attachment is missing the correct user in the event. Probably some
+      context has to be provided.
+- [ ] Only change Metadata if the value did change. Avoids that events are
+      triggered.
+      It might already work if there is a way to avoid that the "Update" flags are
+      checked by default.
+
+- [ ] Add an accounting decoration to show accounting related information
+      like a stamp on the document. This might be doable when using the decorations or
+      transformations feature.
+  - [ ] Research how Decorations work
+  - [ ] Add a custom decoration type
+  - [ ] Show document number
+  - [ ] Show "Booked"
+  - [ ] Show the accounting comment
+  - [ ] Automatically create a new version with the decorations attached on submit.
+
+- [ ] Case "Already booked" to be improved. At the moment it does just raise an
+  exception. A better interim solution would be to show an error message to the
+  user. This way the user would still have access into the navigation.
 
 - [ ] Improve handling of document type
+      A link might be sufficient. When using "Actions -> Change Type" I am
+      redirected back after storing the new type.
   - [ ] Adapt form, show type, date and optional description
   - [ ] Allow to update the type (?) Could also be via action with link back to
         the same page.
+
+
+- [ ] review permission handling
+  - [ ] maybe introduce a specific permission for this form, since it does
+        combine quite a few object types.
 
 - [ ] create metadata configuration in dev system. test terraform provider.
 
@@ -26,6 +67,11 @@
 - [ ] special tag handling
     - if already tagged, show at least a warning
     - what happens if already tagged and the form is submitted
+
+- [ ] Investigate how testing can be best applied
+  - [ ] Simple unit testing which can be quickly used during development
+  - [ ] A higher level testing method for checking the high level workflows and
+        assumptions
 
 
 - [x] Register document action
