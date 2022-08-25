@@ -221,6 +221,10 @@ class AccountingDocumentEditView(
         metadata_queryset = self._get_accounting_metadata()
         metadata = {}
 
+        # TODO: The handling looks very complicated and may be due to the
+        # "multi document" support in the edit metadata view. There is no
+        # reason why for a single document there could ever by two values for a
+        # given metadata type.
         for document_metadata in metadata_queryset:
             # Metadata value cannot be None here, fallback to an empty
             # string
