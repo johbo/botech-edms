@@ -28,7 +28,10 @@ from mayan.apps.views.generics import (
 )
 
 from .forms import CommentForm
-from .settings import setting_botech_booked_tag
+from .settings import (
+    setting_botech_booked_tag,
+    setting_acct_doc_number
+    )
 
 
 class AccountingDocumentEditView(
@@ -284,7 +287,7 @@ class AccountingDocumentEditView(
 
         document = self.object
         metadata_type = MetadataType.objects.get(
-            name='acct_doc_number')
+            name=setting_acct_doc_number.value)
 
         document_metadata = DocumentMetadata(
             document=document,
@@ -295,7 +298,7 @@ class AccountingDocumentEditView(
 
     def _ensure_no_acct_doc_number(self):
         metadata_type = MetadataType.objects.get(
-            name='acct_doc_number')
+            name=setting_acct_doc_number.value)
         document = self.object
 
         document_metadata = DocumentMetadata.objects.filter(
