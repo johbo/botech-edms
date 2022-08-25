@@ -367,6 +367,14 @@ class AccountingDocumentEditView(
     def tag_document_as_booked(self):
         document = self.object
         booked_tag = self._get_booked_tag()
+
+        # TODO: This is a case which should result at least in a warning, since
+        # normally this should not happen.
+        #
+        # Note that attaching the tag does trigger a workflow.
+        if document.tags.filter(pk=booked_tag.pk).exists():
+            raise NotImplementedError()
+
         booked_tag._event_actor = self.request.user
         booked_tag.attach_to(document)
 
