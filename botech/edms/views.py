@@ -76,12 +76,13 @@ class AccountingDocumentEditView(
     form_classes = {
         'metadata': DocumentMetadataFormSet,
         'properties': DocumentPropertiesForm,
-        # 'doc_type': DocumentTypeFilteredSelectForm,
+    }
+    skip_form_validation = {
+        'properties',
     }
     prefixes = {
         'metadata': 'metadata',
         'properties': 'properties',
-        'doc_type': 'doc_type',
     }
 
     object_permission = permission_document_edit
@@ -136,6 +137,24 @@ class AccountingDocumentEditView(
         })
         return context
 
+    def get_form_kwargs(self, form_name):
+        kwargs = {}
+        kwargs.update({'initial': self.get_initial(form_name=form_name)})
+        kwargs.update({'prefix': self.get_prefix(form_name=form_name)})
+
+        if (form_name not in self.skip_form_validation and
+                self.request.method in ('POST', 'PUT')):
+            kwargs.update(
+                {
+                    'data': self.request.POST,
+                    'files': self.request.FILES,
+                }
+            )
+
+        kwargs.update(self.get_form_extra_kwargs(form_name=form_name) or {})
+
+        return kwargs
+
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
         return {
@@ -167,6 +186,15 @@ class AccountingDocumentEditView(
                 }
             )
         return initial
+
+
+    def post(self, request, *args, **kwargs):
+        forms_to_validate = [form for name, form in self.forms.items()
+                 if name not in self.skip_form_validation]
+        if all([form.is_valid() for form in forms_to_validate]):
+            return self.forms_valid(forms=self.forms)
+        else:
+            return self.forms_invalid(forms=self.forms)
 
 
     def all_forms_valid(self, forms):
