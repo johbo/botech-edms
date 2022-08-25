@@ -17,6 +17,7 @@ from mayan.apps.metadata.forms import DocumentMetadataFormSet
 from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
     permission_document_metadata_remove)
+from mayan.apps.tags.models import Tag
 from mayan.apps.views.mixins import (
     MultipleObjectViewMixin,
     RestrictedQuerysetViewMixin,
@@ -26,6 +27,7 @@ from mayan.apps.views.generics import (
 )
 
 from .forms import CommentForm
+from .settings import setting_botech_booked_tag
 
 
 class AccountingDocumentEditView(
@@ -221,6 +223,7 @@ class AccountingDocumentEditView(
 
         self.form_valid_metadata(forms['metadata'])
         self.form_valid_comment(forms['comment'])
+        self.tag_document_as_booked()
 
 
     def form_valid_metadata(self, form):
@@ -277,6 +280,21 @@ class AccountingDocumentEditView(
             message=_(
                 'Attached accounting comment to document %s'
             ) % document, request=self.request)
+
+    def tag_document_as_booked(self):
+        document = self.object
+        booked_tag = self._get_booked_tag()
+        booked_tag.attach_to(document)
+
+        messages.success(
+            message=_(
+                'Attached booked tag to document %s'
+            ) % document, request=self.request)
+
+
+    def _get_booked_tag(self):
+        return Tag.objects.get(label=setting_botech_booked_tag.value)
+
 
     def _get_accounting_metadata(self):
         """
