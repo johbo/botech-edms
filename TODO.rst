@@ -3,6 +3,30 @@
  TODO
 ======
 
+- [ ] docker image
+  - [ ] build a custom image which does contain this codebase
+
+- [ ] Improve handling of document type
+  - [ ] Adapt form, show type, date and optional description
+  - [ ] Allow to update the type (?) Could also be via action with link back to
+        the same page.
+
+- [ ] create metadata configuration in dev system. test terraform provider.
+
+
+- [ ] refactor
+
+        # TODO: This is a copy from matadata.document_views, check if
+        # redundancy in code can be avoided somehow.
+
+- [ ] Menu Entry "Accounting" for documents in sub navigation would be nice.
+
+- [ ] install ipdb into dev environment container
+
+- [ ] special tag handling
+    - if already tagged, show at least a warning
+    - what happens if already tagged and the form is submitted
+
 
 - [x] Register document action
   - [x] link
@@ -141,24 +165,3 @@
   create a new item.
 
 - [x] show a preview of the document
-
-- [ ] Improve handling of document type
-  - [ ] Adapt form, show type, date and optional description
-  - [ ] Allow to update the type (?) Could also be via action with link back to
-        the same page.
-
-- [ ] create metadata configuration in dev system. test terraform provider.
-
-
-- [ ] refactor
-
-        # TODO: This is a copy from matadata.document_views, check if
-        # redundancy in code can be avoided somehow.
-
-- [ ] Menu Entry "Accounting" for documents in sub navigation would be nice.
-
-- [ ] install ipdb into dev environment container
-
-- [ ] special tag handling
-    - if already tagged, show at least a warning
-    - what happens if already tagged and the form is submitted
