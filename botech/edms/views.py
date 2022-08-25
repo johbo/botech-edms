@@ -233,11 +233,15 @@ class AccountingDocumentEditView(
 
         initial = []
         for key, value in metadata.items():
+            # TODO: Why can the form not get the document_metadata object?
             initial.append(
                 {
                     'document_type': document.document_type,
                     'metadata_type': key,
-                    'value': ', '.join(value)
+                    'update': False,
+                    # TODO: refactor below
+                    'value': ', '.join(value) if value else '',
+                    'value_existing': ', '.join(value) if value else ''
                 }
             )
         return initial
