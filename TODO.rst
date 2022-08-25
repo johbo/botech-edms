@@ -83,11 +83,7 @@
 
 - [x] display actual data in the forms
 
-- [ ] show a preview of the document
-
-- [ ] show a comment field
-
-- [ ] show document type
+- [x] show document type
   - [x] Use the properties display
   - [x] research django forms, multiple forms in one post
 
@@ -96,7 +92,7 @@
 
     Now it's a matter of the right templates. Might be that custom adaptions are
     needed to the EDMS templates.
-  - [ ] Verify templates
+  - [x] Verify templates
 
     "generic_form" is the entry point. It can dispatch to "form_subtemplate" if
     a single form is in the context. And it can dispatch into a list of
@@ -115,23 +111,35 @@
     - generic form subtemplate without FORM tag
     - generic form which wraps subtemplates in FORM tag
     - one set of submit / cancel buttons in generic template
+  - [x] don't fail on read only forms
+  - [x] render form into one multi form
 
+- [x] show a comment field
+  - [x] show the comment field
+  - [x] create a comment on the document if text is present
+  - [x] compare model form, to check who should create
 
-  - [ ] render form into one multi form
+    Django's model form does create the model instance and store it. In this
+    simple case the code stays in the view. Complex cases should either go into
+    the form or a separate class.
+
+- [x] tag on submit
+  - [x] inspect tag model
+    The setting must contain the tag label.
+  - [x] settings regarding Tag Label
+  - [x] tag handling
+
+- [ ] show a preview of the document
+
+- [ ] Improve handling of document type
   - [ ] Adapt form, show type, date and optional description
   - [ ] Allow to update the type (?) Could also be via action with link back to
         the same page.
-
-- [ ] tag on submit
-  - [ ] tag handling
-    - if already tagged, show at least a warning
-    - what happens if already tagged and the form is submitted
 
 - [ ] require acct_doc_number on submit
 
 - [ ] create metadata configuration in dev system. test terraform provider.
 
-- [ ] install ipdb into dev environment container
 
 - [ ] Allow to add metadata items which are not yet in the database.
 
@@ -145,3 +153,9 @@
         # redundancy in code can be avoided somehow.
 
 - [ ] Menu Entry "Accounting" for documents in sub navigation would be nice.
+
+- [ ] install ipdb into dev environment container
+
+- [ ] special tag handling
+    - if already tagged, show at least a warning
+    - what happens if already tagged and the form is submitted
