@@ -1,0 +1,2 @@
+
+DEFAULT_BOTECH_BOOKED_TAG = 'Booked'
