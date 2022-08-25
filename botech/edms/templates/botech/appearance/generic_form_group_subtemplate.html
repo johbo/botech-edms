@@ -1,0 +1,47 @@
+{% load i18n %}
+{% load static %}
+
+{% if title %}
+<h4>
+    {{ title }}
+</h4>
+<hr>
+{% endif %}
+
+<div class="well">
+
+  {% if form.management_form %}
+      {% with form as formset %}
+          {{ formset.management_form }}
+
+          {% if form_display_mode_table %}
+              <div class="table-responsive">
+                  <table class="table table-condensed table-striped">
+                      <tbody>
+                      <tr>
+                          {% for field in formset.forms.0.visible_fields %}
+                              <th>
+                                  {{ field.label_tag }}{% if field.field.required and not read_only %} ({% trans 'required' %}){% endif %}
+                              </th>
+                          {% endfor %}
+                      </tr>
+          {% endif %}
+
+          {% for form in formset.forms %}
+              {% include 'appearance/generic_form_instance.html' %}
+          {% empty %}
+              <tr><td class="text-center" colspan=99>
+                  {% include 'appearance/partials/no_results.html' %}
+              </td></tr>
+          {% endfor %}
+
+          {% if form_display_mode_table %}
+                  </tbody>
+              </table>
+          </div>
+          {% endif %}
+      {% endwith %}
+  {% else %}
+      {% include 'appearance/generic_form_instance.html' %}
+  {% endif %}
+</div>

@@ -1,0 +1,103 @@
+{% extends 'appearance/base.html' %}
+
+{% load i18n %}
+{% load views_tags %}
+
+{% block title %}{% include 'appearance/partials/form_title.html' with non_html_title=True %}{% endblock %}
+
+{% block content %}
+  <div class="row">
+
+    {% if is_multipart %}
+        <form action="{{ form_action }}" class="{{ form_css_classes|default:'' }}" enctype="multipart/form-data" method="{{ submit_method|default:'post' }}" name="{{ form.prefix|default:'' }}" target="{{ submit_target|default:'_self' }}">
+    {% else %}
+        <form action="{{ form_action }}" class="{{ form_css_classes|default:'' }}" method="{{ submit_method|default:'post' }}" name="{{ form.prefix|default:'' }}" target="{{ submit_target|default:'_self' }}">
+    {% endif %}
+
+        {% if step_field %}
+            <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+        {% endif %}
+
+        {% if submit_method != 'GET' and submit_method != 'get' %}
+            {% csrf_token %}
+        {% endif %}
+
+        {% if next %}
+            <input name="next" type="hidden" value="{{ next }}" />
+        {% endif %}
+
+        {% if previous %}
+            <input name="previous" type="hidden" value="{{ previous }}" />
+        {% endif %}
+
+        {% for hidden_field in hidden_fields %}
+          {{ hidden_field.as_hidden }}
+        {% endfor %}
+
+
+
+
+
+    {% for subtemplate in subtemplates_list %}
+      {% if subtemplate.column_class %}
+        <div class="{{ subtemplate.column_class }}">
+      {% else %}
+        <div class="col-xs-12">
+      {% endif %}
+
+      {% views_render_subtemplate subtemplate.name subtemplate.context as rendered_subtemplate %}
+      {{ rendered_subtemplate }}
+        </div>
+    {% endfor %}
+
+
+
+
+    {% if not read_only %}
+
+      <div class="form-group">
+          {% for button in form_button_overrides %}
+              <button class="btn btn-primary {{ button.css_classes }}{% if button.is_primary %}btn-hotkey-default{% endif %}" {% if button.disabled %}disabled="disabled"{% endif %} name="{% if button.name_override %}{{ button.name_override }}{% else %}{{ button.name }}{% endif %}" type="submit" value="{{ button.value }}">
+                  {% if button.icon %}
+                      {{ button.icon.render }}
+                  {% else %}
+                      <i class="fa fa-check"></i>
+                  {% endif %}
+                  {% if button.label %}{{ button.label }}{% else %}{% if object %}{% trans 'Save' %}{% else %}{% trans 'Submit' %}{% endif %}{% endif %}
+              </button>
+              &nbsp;
+          {% empty %}
+              <button class="btn btn-primary btn-hotkey-default" name="submit" type="submit">
+                  {% if submit_icon %}
+                      {{ submit_icon.render }}
+                  {% else %}
+                      <i class="fa fa-check"></i>
+                  {% endif %}
+                  {% if submit_label %}{{ submit_label }}{% else %}{% if form.instance %}{% trans 'Save' %}{% else %}{% trans 'Submit' %}{% endif %}{% endif %}
+              </button>
+
+              {% if previous %}
+                    &nbsp;<a class="btn btn-default" onclick='history.back();'>
+                      <i class="fa fa-times"></i> {% if cancel_label %}{{ cancel_label }}{% else %}{% trans 'Cancel' %}{% endif %}
+                    </a>
+              {% endif %}
+
+              {% for button in extra_buttons %}
+                  &nbsp;
+                  <button class="btn btn-default" name="{{ button.name }}{{ button.name }}" type="submit">
+                      {% if button.icon %}
+                          {{ button.icon.render }}
+                      {% endif %}
+                      {% if button.label %}{{ button.label }}{% else %}{% if object %}{% trans 'Save' %}{% else %}{% trans 'Submit' %}{% endif %}{% endif %}
+                  </button>
+              {% endfor %}
+          {% endfor %}
+      </div>
+    {% endif %}
+
+
+
+    </form>
+
+  </div>
+{% endblock %}
