@@ -11,6 +11,7 @@ from mayan.apps.documents.forms.document_forms import DocumentForm, DocumentProp
 from mayan.apps.documents.forms.document_type_forms import DocumentTypeFilteredSelectForm
 from mayan.apps.documents.permissions import (
     permission_document_edit)
+from mayan.apps.document_comments.models import Comment
 from mayan.apps.metadata.api import save_metadata_list
 from mayan.apps.metadata.forms import DocumentMetadataFormSet
 from mayan.apps.metadata.permissions import (
@@ -121,6 +122,7 @@ class AccountingDocumentEditView(
         context.update({
             'title': _('Process Document for Accounting'),
             'subtitle': document.label,
+            'submit_label': _('Save and mark as booked'),
             'subtemplates_list': [
                 {
                     'name': 'botech/appearance/generic_form_group_subtemplate.html',
@@ -261,12 +263,20 @@ class AccountingDocumentEditView(
             )
 
     def form_valid_comment(self, form):
+        document = self.object
         text = form.cleaned_data['text']
         if not text:
             return
 
-        # TODO: attach a comment if text is present
-        raise NotImplementedError("")
+        comment = Comment(
+            document = document,
+            user = self.request.user,
+            text = text)
+        comment.save()
+        messages.success(
+            message=_(
+                'Attached accounting comment to document %s'
+            ) % document, request=self.request)
 
     def _get_accounting_metadata(self):
         """
