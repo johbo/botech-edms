@@ -129,23 +129,26 @@
   - [x] settings regarding Tag Label
   - [x] tag handling
 
-- [ ] show a preview of the document
+- [x] require acct_doc_number on submit
+  - [x] show field always in form
+  - [x] require a value
+  - [x] setting regarding name
+
+- [x] Allow to add metadata items which are not yet in the database.
+
+  E.g. document number may not yet be set, the form should always show it and
+  instead of only updating if it does already exist in the database, it should
+  create a new item.
+
+- [x] show a preview of the document
 
 - [ ] Improve handling of document type
   - [ ] Adapt form, show type, date and optional description
   - [ ] Allow to update the type (?) Could also be via action with link back to
         the same page.
 
-- [ ] require acct_doc_number on submit
-
 - [ ] create metadata configuration in dev system. test terraform provider.
 
-
-- [ ] Allow to add metadata items which are not yet in the database.
-
-  E.g. document number may not yet be set, the form should always show it and
-  instead of only updating if it does already exist in the database, it should
-  create a new item.
 
 - [ ] refactor
 
