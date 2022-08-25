@@ -6,11 +6,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
 
 from mayan.apps.acls.models import AccessControlList
+from mayan.apps.converter.transformations import TransformationResize
 from mayan.apps.documents.models import Document
 from mayan.apps.documents.forms.document_forms import DocumentForm, DocumentPropertiesForm
 from mayan.apps.documents.forms.document_type_forms import DocumentTypeFilteredSelectForm
+from mayan.apps.documents.forms.document_version_forms import (
+    DocumentVersionPreviewForm)
 from mayan.apps.documents.permissions import (
     permission_document_edit)
+from mayan.apps.documents.settings import (
+    setting_preview_height,
+    setting_preview_width)
 from mayan.apps.document_comments.models import Comment
 from mayan.apps.metadata.api import save_metadata_list
 from mayan.apps.metadata.forms import DocumentMetadataFormSet
@@ -24,14 +30,12 @@ from mayan.apps.views.mixins import (
     RestrictedQuerysetViewMixin,
     RedirectionViewMixin)
 from mayan.apps.views.generics import (
-    ConfirmView, MultiFormView, MultipleObjectFormActionView
-)
+    ConfirmView, MultiFormView, MultipleObjectFormActionView)
 
 from .forms import CommentForm
 from .settings import (
     setting_botech_booked_tag,
-    setting_acct_doc_number
-    )
+    setting_acct_doc_number)
 
 
 class AccountingDocumentEditView(
@@ -86,14 +90,17 @@ class AccountingDocumentEditView(
         'metadata': DocumentMetadataFormSet,
         'properties': DocumentPropertiesForm,
         'comment': CommentForm,
+        'preview': DocumentVersionPreviewForm,
     }
     skip_form_validation = {
         'properties',
+        'preview',
     }
     prefixes = {
         'metadata': 'metadata',
         'properties': 'properties',
         'comment': 'comment',
+        'preview': 'preview',
     }
 
     object_permission = permission_document_edit
@@ -147,6 +154,15 @@ class AccountingDocumentEditView(
                 {
                     'name': 'botech/appearance/generic_form_group_subtemplate.html',
                     'context': {
+                        'form': forms['preview'],
+                        'title': _('Document preview'),
+                        'object': document,
+                        'hide_labels': True,
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
                         'form': forms['metadata'],
                         'form_display_mode_table': True,
                         'title': _('Accounting metadata'),
@@ -185,6 +201,19 @@ class AccountingDocumentEditView(
         document = self.get_object()
         return {
             'instance': document,
+        }
+
+    def get_form_extra_kwargs__preview(self):
+        transformation_instance_list = (
+            TransformationResize(
+                height=setting_preview_height.value,
+                width=setting_preview_width.value
+            ),
+        )
+
+        return {
+            'instance': self.object,
+            'transformation_instance_list': transformation_instance_list
         }
 
     def get_initial__metadata(self):
