@@ -24,6 +24,8 @@ from mayan.apps.views.generics import (
     ConfirmView, MultiFormView, MultipleObjectFormActionView
 )
 
+from .forms import CommentForm
+
 
 class AccountingDocumentEditView(
         RestrictedQuerysetViewMixin,
@@ -76,6 +78,7 @@ class AccountingDocumentEditView(
     form_classes = {
         'metadata': DocumentMetadataFormSet,
         'properties': DocumentPropertiesForm,
+        'comment': CommentForm,
     }
     skip_form_validation = {
         'properties',
@@ -83,6 +86,7 @@ class AccountingDocumentEditView(
     prefixes = {
         'metadata': 'metadata',
         'properties': 'properties',
+        'comment': 'comment',
     }
 
     object_permission = permission_document_edit
@@ -112,6 +116,7 @@ class AccountingDocumentEditView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         document = self.object
+        forms = context['forms']
 
         context.update({
             'title': _('Process Document for Accounting'),
@@ -120,7 +125,7 @@ class AccountingDocumentEditView(
                 {
                     'name': 'botech/appearance/generic_form_group_subtemplate.html',
                     'context': {
-                        'form': context['forms']['properties'],
+                        'form': forms['properties'],
                         'title': _('Document properties'),
                         'read_only': True,
                     },
@@ -128,9 +133,16 @@ class AccountingDocumentEditView(
                 {
                     'name': 'botech/appearance/generic_form_group_subtemplate.html',
                     'context': {
-                        'form': context['forms']['metadata'],
+                        'form': forms['metadata'],
                         'form_display_mode_table': True,
                         'title': _('Accounting metadata'),
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
+                        'form': forms['comment'],
+                        'title': _('Account assignment and remarks'),
                     },
                 },
             ]
@@ -206,6 +218,7 @@ class AccountingDocumentEditView(
         """
 
         self.form_valid_metadata(forms['metadata'])
+        self.form_valid_comment(forms['comment'])
 
 
     def form_valid_metadata(self, form):
@@ -246,6 +259,14 @@ class AccountingDocumentEditView(
                     'Metadata for document %s edited successfully.'
                 ) % document, request=self.request
             )
+
+    def form_valid_comment(self, form):
+        text = form.cleaned_data['text']
+        if not text:
+            return
+
+        # TODO: attach a comment if text is present
+        raise NotImplementedError("")
 
     def _get_accounting_metadata(self):
         """
