@@ -24,11 +24,44 @@
       like a stamp on the document. This might be doable when using the decorations or
       transformations feature.
   - [ ] Research how Decorations work
+
+    Docs: Transformations are mentioned there, but not decorations.
+
+    Transformations can both be applied to file pages as well as version pages.
+    So a decision would have to be made, where it should be applied. Current
+    thought is that we should go for the version and not for the file. Reason is
+    that a file may also contain garbage from scanning. A version would be the
+    view into the file and may have e.g. blank pages removed. Assumption is that
+    the preview of a document also is based on the active version.
+
+    The release notes of version 3.5 mention this, see
+    https://docs.mayan-edms.com/releases/3.5.html?highlight=decorations#converter
+
+    So it seems that this is based on transformations and just a new class or
+    type of transformation.
+
+    The implementation seems to be within the app "converter".
+
+    There are two layers implemented: One is decorations and one is
+    transformations, both seem to technically contain the same type of items.
+
+    The transformations are registered into the layer, code is in the end of the
+    file "transformations.py".
+
+    The image manipulation code is inside of PIL.
+
+  - [ ] Refactor: Track the date in a metadata field and set it on submit
+  - [ ] Refactor: Track the comment in a metadata field
   - [ ] Add a custom decoration type
   - [ ] Show document number
   - [ ] Show "Booked"
+  - [ ] Show date "Booked 2022-08-25"
+        This means that the date will have to be tracked, could be a custom metadata type.
   - [ ] Show the accounting comment
+        This means that the accounting comment will become special, so this should
+        be captured in a metadata attribute.
   - [ ] Automatically create a new version with the decorations attached on submit.
+        Think twice, does it really need a new version?
 
 - [ ] Case "Already booked" to be improved. At the moment it does just raise an
   exception. A better interim solution would be to show an error message to the
