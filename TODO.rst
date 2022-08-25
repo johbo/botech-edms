@@ -19,12 +19,6 @@
 - [ ] Add documentation as a Sphinx based document
 
 - [ ] Add event into the audit log about usage of accounting view
-- [ ] Tag attachment is missing the correct user in the event. Probably some
-      context has to be provided.
-- [ ] Only change Metadata if the value did change. Avoids that events are
-      triggered.
-      It might already work if there is a way to avoid that the "Update" flags are
-      checked by default.
 
 - [ ] Add an accounting decoration to show accounting related information
       like a stamp on the document. This might be doable when using the decorations or
@@ -72,6 +66,26 @@
   - [ ] Simple unit testing which can be quickly used during development
   - [ ] A higher level testing method for checking the high level workflows and
         assumptions
+
+- [x] Tag attachment is missing the correct user in the event. Probably some
+      context has to be provided.
+      The instance can be assigned an attribute "_event_actor" to inject this
+      information.
+- [x] Only attach tag if it is not yet attached
+
+- [x] Only change Metadata if the value did change. Avoids that events are
+      triggered.
+      It might already work if there is a way to avoid that the "Update" flags are
+      checked by default.
+      - [x] Investigate the Metadata view used via "Actions -> Edit Metadata"
+            It seems to suffer the same issue.
+      - [x] Investigate the Form and view implementation
+            The attribute "update" is configured with "initial=True".
+            It seems tat the view will have to pass in values for "initial".
+      - [x] Set "initial" in view
+            This does make the form validation fail, still, why should it fail if I
+            don't want to change a value even if it is required?
+      - [x] Find out why form validation fails.
 
 
 - [x] Register document action
