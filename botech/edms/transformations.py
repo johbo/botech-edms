@@ -38,6 +38,28 @@ class TransformationStampAccountingMetadata(
         # Let the mixin do the work
         return super()._execute_on(self, *args, **kwargs)
 
+    def get_document(self):
+        """
+        Get the Document instance to which this transformation is applied.
+        """
+
+        file_or_version_page = self.object_layer.content_object
+        document = _document_from_file_or_version_page(file_or_version_page)
+        return document
+
+# TODO: This should be provided by the page model to get the parent.
+# This is internal knowledge of the documents app and should be moved
+# into the mayan-edms repository.
+def _document_from_file_or_version_page(file_or_version_page):
+        page_parent = _page_parent(file_or_version_page)
+        document = page_parent.document
+        return document
+
+def _page_parent(file_or_version_page):
+    parent_attr = file_or_version_page._paged_model_parent_field
+    return getattr(file_or_version_page, parent_attr)
+
+
 
 BaseTransformation.register(
     layer=layer_decorations,
