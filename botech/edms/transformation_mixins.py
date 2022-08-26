@@ -5,7 +5,7 @@ from PIL import Image, ImageColor, ImageDraw, ImageFont
 
 class TransformationStampAccountingMetadataMixin:
 
-    def _execute_on(self, *args, **kwargs):
+    def stamp_accounting_data(self):
         # TODO: opacity? RGBA mode?
 
         font_bytes = pkgutil.get_data('botech.edms', 'fonts/Roboto-Bold.ttf')

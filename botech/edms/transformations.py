@@ -34,9 +34,19 @@ class TransformationStampAccountingMetadata(
     def execute_on(self, *args, **kwargs):
         # Prepare all arguments
         super().execute_on(*args, **kwargs)
+        self._prepare_arguments()
 
         # Let the mixin do the work
-        return super()._execute_on(self, *args, **kwargs)
+        return self.stamp_accounting_data()
+
+    def _prepare_arguments(self):
+
+        # TODO: Data from metadata
+
+        self.acct_doc_number = 'ER1234'
+        self.acct_booked_stamp = 'BOOKED 2022-08-25'
+        self.acct_assignment = '1234 / 1234\n19% VAT'
+
 
     def get_document(self):
         """
