@@ -35,6 +35,7 @@ from mayan.apps.views.generics import (
 from .forms import CommentForm
 from .settings import (
     setting_botech_booked_tag,
+    setting_acct_assignment,
     setting_acct_doc_number)
 
 
@@ -321,7 +322,7 @@ class AccountingDocumentEditView(
         self._set_acct_doc_number(acct_doc_number)
 
         comment_text = form.cleaned_data['text']
-        self._add_comment_if_provided(comment_text)
+        self._set_assignment_comment_if_provided(comment_text)
 
     def _set_acct_doc_number(self, acct_doc_number):
         self._ensure_no_acct_doc_number()
@@ -349,20 +350,17 @@ class AccountingDocumentEditView(
             raise NotImplementedError('Handling for this case is not yet implemented')
 
 
-    def _add_comment_if_provided(self, comment_text):
+    def _set_assignment_comment_if_provided(self, comment_text):
         document = self.object
-        if not comment_text:
-            return
+        metadata_type = MetadataType.objects.get(
+            name=setting_acct_assignment.value)
 
-        comment = Comment(
-            document = document,
-            user = self.request.user,
-            text = comment_text)
-        comment.save()
-        messages.success(
-            message=_(
-                'Attached accounting comment to document %s'
-            ) % document, request=self.request)
+        document_metadata, created = DocumentMetadata.objects.get_or_create(
+            metadata_type=metadata_type,
+            document=document)
+        document_metadata.value = comment_text
+        document_metadata._event_actor = self.request.user
+        document_metadata.save()
 
     def tag_document_as_booked(self):
         document = self.object

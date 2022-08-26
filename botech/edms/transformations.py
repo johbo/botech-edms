@@ -6,7 +6,11 @@ from mayan.apps.converter.transformations import BaseTransformation
 from mayan.apps.metadata.models import DocumentMetadata
 from mayan.apps.views.forms import Form
 
-from . import literals
+from .settings import (
+    setting_acct_assignment,
+    setting_acct_booked_date,
+    setting_acct_doc_number,
+)
 from .transformation_mixins import TransformationStampAccountingMetadataMixin
 
 
@@ -55,9 +59,10 @@ class TransformationStampAccountingMetadata(
                 # situation.
                 return ''
 
-        self.acct_doc_number = metadata_value(literals.ACCT_DOC_NUMBER)
-        self.acct_booked_stamp = 'BOOKED ' + metadata_value(literals.ACCT_BOOKED_DATE)
-        self.acct_assignment = metadata_value(literals.ACCT_ASSIGNMENT)
+        self.acct_doc_number = metadata_value(setting_acct_doc_number.value)
+        self.acct_booked_stamp = 'BOOKED ' + metadata_value(
+            setting_acct_booked_date.value)
+        self.acct_assignment = metadata_value(setting_acct_assignment.value)
 
 
     def get_document(self):
