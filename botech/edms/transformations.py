@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from mayan.apps.converter.layers import layer_decorations
 from mayan.apps.converter.transformations import BaseTransformation
+from mayan.apps.metadata.models import DocumentMetadata
 from mayan.apps.views.forms import Form
 
 from .transformation_mixins import TransformationStampAccountingMetadataMixin
@@ -41,11 +42,21 @@ class TransformationStampAccountingMetadata(
 
     def _prepare_arguments(self):
 
-        # TODO: Data from metadata
+        document = self.get_document()
+        document_metadata = document.metadata
 
-        self.acct_doc_number = 'ER1235'
-        self.acct_booked_stamp = 'BOOKED 2022-08-25'
-        self.acct_assignment = '1234 / 1234\n19% VAT'
+        def metadata_value(type_name):
+            try:
+                return document_metadata.get(
+                    metadata_type__name=type_name).value
+            except DocumentMetadata.DoesNotExist as e:
+                # TODO: This case is exceptional, work on better handling of this
+                # situation.
+                return ''
+
+        self.acct_doc_number = metadata_value('acct_doc_number')
+        self.acct_booked_stamp = 'BOOKED ' + metadata_value('acct_booked_date')
+        self.acct_assignment = metadata_value('acct_assignment')
 
 
     def get_document(self):
