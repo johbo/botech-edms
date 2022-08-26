@@ -414,7 +414,12 @@ class AccountingDocumentEditView(
             user=user
         )
 
-        # TODO: Restrict this to only the accounting related metadata instances
+        # TODO: Refactor the forms and the initial methods.
+        metadata = metadata.exclude(
+            metadata_type__name__in=[
+                setting_acct_doc_number.value,
+                setting_acct_assignment.value,
+            ])
 
         return metadata
 
