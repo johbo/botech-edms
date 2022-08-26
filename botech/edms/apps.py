@@ -3,6 +3,8 @@ from django.apps import apps
 from mayan.apps.common.apps import MayanAppConfig
 from mayan.apps.common.menus import menu_object
 
+# TODO: Check if this is the right place to trigger the import
+from . import transformations
 from .links import link_acct_document_edit_view
 
 
