@@ -7,6 +7,7 @@ from PIL import Image, ImageColor, ImageDraw, ImageFont
 ANCHOR_RIGHT_ASCENDER = 'ra'
 ANCHOR_RIGHT_DESCENDER = 'rd'
 
+
 class TransformationStampAccountingMetadataMixin:
 
     def execute_on(self, *args, **kwargs):
@@ -22,8 +23,6 @@ class TransformationStampAccountingMetadataMixin:
         image = image.convert(mode='RGBA')
         txt_image = Image.new(
             mode='RGBA', size=image.size, color=(255, 255, 255, 0))
-
-
         draw = ImageDraw.Draw(im=txt_image)
 
         # TODO: calculated positions better:
@@ -31,30 +30,23 @@ class TransformationStampAccountingMetadataMixin:
         # - x percent from the bottom
         pos_x = image.size[0] - 200
         pos_y = 100
-        stamp_text = self.acct_doc_number
-        text_color = (255, 0, 0, 125)
+        text_color = (255, 0, 0, 155)
 
         draw.text(
-            (pos_x, pos_y), stamp_text,
+            (pos_x, pos_y), self.acct_doc_number,
             anchor=ANCHOR_RIGHT_ASCENDER, font=self.font,
-            fill=text_color,
-            # TODO: Check if this is interesting to create outline fonts and be
-            # more robust so that the document shines through
-            # stroke_fill=150, stroke_width=5
-        )
+            fill=text_color)
 
         pos_y = 200
-        stamp_text = self.acct_booked_stamp
 
         draw.text(
-            (pos_x, pos_y), stamp_text,
+            (pos_x, pos_y), self.acct_booked_stamp,
             anchor=ANCHOR_RIGHT_ASCENDER, font=self.font, fill=text_color)
 
         pos_y = image.size[1] - 500
-        stamp_text = self.acct_assignment
 
         draw.text(
-            (pos_x, pos_y), stamp_text,
+            (pos_x, pos_y), self.acct_assignment,
             anchor=ANCHOR_RIGHT_DESCENDER, font=self.font, fill=text_color)
 
         image = Image.alpha_composite(image, txt_image)
