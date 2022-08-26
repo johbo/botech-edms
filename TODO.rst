@@ -55,6 +55,37 @@
   - [x] Add a custom decoration type
     - [x] register in layer
   - [x] Show "Booked"
+  - [x] Find document in transformation
+
+    converter.models contains LayerTransformation. This model configures a
+    transformation for a given object. It is connected via a generic foreign key
+    relation.
+
+    Using "LayerTransformation.get_relation_class" is probably used to get the
+    corresponding transformation.
+
+    "LayerTransformatinManager" is providing a method "get_for_object" which
+    does allow to get a list of instances of the transformation classes. Those
+    instances seem to receive an attribute "object_layer":
+
+        tranformation_instance.object_layer = transformation.object_layer
+
+    This is an instance of the model "ObjectLayer" which contains the
+    relationship to the original object:
+
+        content_type = models.ForeignKey(on_delete=models.CASCADE, to=ContentType)
+        object_id = models.PositiveIntegerField()
+        content_object = GenericForeignKey(
+            ct_field='content_type', fk_field='object_id'
+        )
+
+    If this attribute is present on the running transformation, then this allows
+    to find the document with ease and get all required data.
+
+    The app "signature_capture" is using this attribute, so it seems to be
+    intended for this purpose.
+
+  - [ ] Investigate what interactive transformations in doc version page model are
   - [ ] Show document number
   - [ ] Show date "Booked 2022-08-25"
         This means that the date will have to be tracked, could be a custom metadata type.
@@ -64,6 +95,13 @@
   - [ ] Automatically create a new version with the decorations attached on
         submit. Think twice, does it really need a new version? Just add the
         decoration to the active version.
+
+- [ ] Send patch for "PageModel.parent" as a property or a utility method
+      Replaces transformations._document_from_file_or_version_page
+
+      See also the signature capture transformation which does implement a
+      "get_document" as well. It also contains an if statement to differentiate
+      between the page models. Think this knowledge should not be there.
 
 - [ ] Case "Already booked" to be improved. At the moment it does just raise an
   exception. A better interim solution would be to show an error message to the
@@ -101,6 +139,8 @@
   - [ ] Simple unit testing which can be quickly used during development
   - [ ] A higher level testing method for checking the high level workflows and
         assumptions
+
+- [ ] Investigate how to disable file caches for development
 
 - [x] Tag attachment is missing the correct user in the event. Probably some
       context has to be provided.
