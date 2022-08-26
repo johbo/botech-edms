@@ -52,16 +52,18 @@
 
   - [ ] Refactor: Track the date in a metadata field and set it on submit
   - [ ] Refactor: Track the comment in a metadata field
-  - [ ] Add a custom decoration type
+  - [x] Add a custom decoration type
+    - [x] register in layer
+  - [x] Show "Booked"
   - [ ] Show document number
-  - [ ] Show "Booked"
   - [ ] Show date "Booked 2022-08-25"
         This means that the date will have to be tracked, could be a custom metadata type.
   - [ ] Show the accounting comment
         This means that the accounting comment will become special, so this should
         be captured in a metadata attribute.
-  - [ ] Automatically create a new version with the decorations attached on submit.
-        Think twice, does it really need a new version?
+  - [ ] Automatically create a new version with the decorations attached on
+        submit. Think twice, does it really need a new version? Just add the
+        decoration to the active version.
 
 - [ ] Case "Already booked" to be improved. At the moment it does just raise an
   exception. A better interim solution would be to show an error message to the
