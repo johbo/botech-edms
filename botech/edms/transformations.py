@@ -37,13 +37,13 @@ class TransformationStampAccountingMetadata(
         self._prepare_arguments()
 
         # Let the mixin do the work
-        return self.stamp_accounting_data()
+        return self.stamp_accounting_data(self.image)
 
     def _prepare_arguments(self):
 
         # TODO: Data from metadata
 
-        self.acct_doc_number = 'ER1234'
+        self.acct_doc_number = 'ER1235'
         self.acct_booked_stamp = 'BOOKED 2022-08-25'
         self.acct_assignment = '1234 / 1234\n19% VAT'
 
