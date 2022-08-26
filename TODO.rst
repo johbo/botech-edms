@@ -23,7 +23,7 @@
 - [ ] Add an accounting decoration to show accounting related information
       like a stamp on the document. This might be doable when using the decorations or
       transformations feature.
-  - [ ] Research how Decorations work
+  - [x] Research how Decorations work
 
     Docs: Transformations are mentioned there, but not decorations.
 
@@ -85,6 +85,8 @@
     The app "signature_capture" is using this attribute, so it seems to be
     intended for this purpose.
 
+  - [x] placement from the right side
+  - [x] test if opacity can be added
   - [ ] Investigate what interactive transformations in doc version page model are
   - [ ] Show document number
   - [ ] Show date "Booked 2022-08-25"
@@ -95,6 +97,8 @@
   - [ ] Automatically create a new version with the decorations attached on
         submit. Think twice, does it really need a new version? Just add the
         decoration to the active version.
+
+- [ ] Document metadata configuration in handbook
 
 - [ ] Send patch for "PageModel.parent" as a property or a utility method
       Replaces transformations._document_from_file_or_version_page
