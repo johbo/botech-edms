@@ -255,6 +255,21 @@ class AccountingDocumentEditView(
             )
         return initial
 
+    def get_initial__comment(self):
+        document = self.object
+        initial = {}
+
+        metadata_type = MetadataType.objects.get(
+            name=setting_acct_assignment.value)
+        try:
+            document_metadata = DocumentMetadata.objects.get(
+                metadata_type=metadata_type,
+                document=document)
+            initial['text'] = document_metadata.value
+        except DocumentMetadata.DoesNotExist:
+            pass
+
+        return initial
 
     def post(self, request, *args, **kwargs):
         forms_to_validate = [form for name, form in self.forms.items()
