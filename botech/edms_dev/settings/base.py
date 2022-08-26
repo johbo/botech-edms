@@ -1,4 +1,6 @@
-from mayan.settings.development.ddt import *
+from mayan.settings.development import *
+# Debug Toolbar
+# from mayan.settings.development.ddt import *
 
 INSTALLED_APPS += (
     'botech.edms',
