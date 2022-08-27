@@ -20,83 +20,15 @@
 
 - [ ] Add event into the audit log about usage of accounting view
 
-- [ ] Add an accounting decoration to show accounting related information
-      like a stamp on the document. This might be doable when using the decorations or
-      transformations feature.
-  - [x] Research how Decorations work
+- [ ] check if file cache can be invalidated when metadata changes so that the
+  transformation is applied again.
 
-    Docs: Transformations are mentioned there, but not decorations.
 
-    Transformations can both be applied to file pages as well as version pages.
-    So a decision would have to be made, where it should be applied. Current
-    thought is that we should go for the version and not for the file. Reason is
-    that a file may also contain garbage from scanning. A version would be the
-    view into the file and may have e.g. blank pages removed. Assumption is that
-    the preview of a document also is based on the active version.
+- [ ] Handling of missing metadata in transformation
 
-    The release notes of version 3.5 mention this, see
-    https://docs.mayan-edms.com/releases/3.5.html?highlight=decorations#converter
+- [ ] Handling of the default value for the booked date.
+  Just "date.today().isoformat()" may be a bit too naive.
 
-    So it seems that this is based on transformations and just a new class or
-    type of transformation.
-
-    The implementation seems to be within the app "converter".
-
-    There are two layers implemented: One is decorations and one is
-    transformations, both seem to technically contain the same type of items.
-
-    The transformations are registered into the layer, code is in the end of the
-    file "transformations.py".
-
-    The image manipulation code is inside of PIL.
-
-  - [ ] Refactor: Track the date in a metadata field and set it on submit
-  - [ ] Refactor: Track the comment in a metadata field
-  - [x] Add a custom decoration type
-    - [x] register in layer
-  - [x] Show "Booked"
-  - [x] Find document in transformation
-
-    converter.models contains LayerTransformation. This model configures a
-    transformation for a given object. It is connected via a generic foreign key
-    relation.
-
-    Using "LayerTransformation.get_relation_class" is probably used to get the
-    corresponding transformation.
-
-    "LayerTransformatinManager" is providing a method "get_for_object" which
-    does allow to get a list of instances of the transformation classes. Those
-    instances seem to receive an attribute "object_layer":
-
-        tranformation_instance.object_layer = transformation.object_layer
-
-    This is an instance of the model "ObjectLayer" which contains the
-    relationship to the original object:
-
-        content_type = models.ForeignKey(on_delete=models.CASCADE, to=ContentType)
-        object_id = models.PositiveIntegerField()
-        content_object = GenericForeignKey(
-            ct_field='content_type', fk_field='object_id'
-        )
-
-    If this attribute is present on the running transformation, then this allows
-    to find the document with ease and get all required data.
-
-    The app "signature_capture" is using this attribute, so it seems to be
-    intended for this purpose.
-
-  - [x] placement from the right side
-  - [x] test if opacity can be added
-  - [ ] Investigate what interactive transformations in doc version page model are
-  - [ ] Show document number
-  - [ ] Show date "Booked 2022-08-25"
-        This means that the date will have to be tracked, could be a custom metadata type.
-  - [ ] Show the accounting comment
-        This means that the accounting comment will become special, so this should
-        be captured in a metadata attribute.
-  - [ ] Automatically create a new version with the decorations attached on
-        submit. Think twice, does it really need a new version? Just add the
-        decoration to the active version.
 
 - [ ] Document metadata configuration in handbook
 
@@ -145,6 +77,90 @@
         assumptions
 
 - [ ] Investigate how to disable file caches for development
+
+- [x] Add an accounting decoration to show accounting related information
+      like a stamp on the document. This might be doable when using the decorations or
+      transformations feature.
+  - [x] Research how Decorations work
+
+    Docs: Transformations are mentioned there, but not decorations.
+
+    Transformations can both be applied to file pages as well as version pages.
+    So a decision would have to be made, where it should be applied. Current
+    thought is that we should go for the version and not for the file. Reason is
+    that a file may also contain garbage from scanning. A version would be the
+    view into the file and may have e.g. blank pages removed. Assumption is that
+    the preview of a document also is based on the active version.
+
+    The release notes of version 3.5 mention this, see
+    https://docs.mayan-edms.com/releases/3.5.html?highlight=decorations#converter
+
+    So it seems that this is based on transformations and just a new class or
+    type of transformation.
+
+    The implementation seems to be within the app "converter".
+
+    There are two layers implemented: One is decorations and one is
+    transformations, both seem to technically contain the same type of items.
+
+    The transformations are registered into the layer, code is in the end of the
+    file "transformations.py".
+
+    The image manipulation code is inside of PIL.
+
+  - [x] Add a custom decoration type
+    - [x] register in layer
+  - [x] Show "Booked"
+  - [x] Find document in transformation
+
+    converter.models contains LayerTransformation. This model configures a
+    transformation for a given object. It is connected via a generic foreign key
+    relation.
+
+    Using "LayerTransformation.get_relation_class" is probably used to get the
+    corresponding transformation.
+
+    "LayerTransformatinManager" is providing a method "get_for_object" which
+    does allow to get a list of instances of the transformation classes. Those
+    instances seem to receive an attribute "object_layer":
+
+        tranformation_instance.object_layer = transformation.object_layer
+
+    This is an instance of the model "ObjectLayer" which contains the
+    relationship to the original object:
+
+        content_type = models.ForeignKey(on_delete=models.CASCADE, to=ContentType)
+        object_id = models.PositiveIntegerField()
+        content_object = GenericForeignKey(
+            ct_field='content_type', fk_field='object_id'
+        )
+
+    If this attribute is present on the running transformation, then this allows
+    to find the document with ease and get all required data.
+
+    The app "signature_capture" is using this attribute, so it seems to be
+    intended for this purpose.
+
+  - [x] placement from the right side
+  - [x] test if opacity can be added
+  - [x] Show document number
+  - [x] Show date "Booked 2022-08-25"
+        This means that the date will have to be tracked, could be a custom metadata type.
+  - [x] Show the accounting comment
+        This means that the accounting comment will become special, so this should
+        be captured in a metadata attribute.
+  - [x] Refactor: Names of metadata types into literals.py
+  - [x] Refactor: Track the comment in a metadata field
+    - [x] show initial value if present
+    - [x] hide comment from metadata overview
+  - [x] Refactor: Track the date in a metadata field and set it on submit
+  - [x] Automatically create a new version with the decorations attached on
+        submit. Think twice, does it really need a new version? Just add the
+        decoration to the active version.
+
+        Conclusion is to automatically attach it to the active version.
+  - [x] Ensure that the file cache is invalidated
+
 
 - [x] Tag attachment is missing the correct user in the event. Probably some
       context has to be provided.
@@ -304,3 +320,8 @@
   create a new item.
 
 - [x] show a preview of the document
+
+- [x] Investigate what interactive transformations in doc version page model are
+      Try to find out what the intended usage is.
+
+      Did not find a good starting point, and it's not that important anymore.
