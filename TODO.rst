@@ -12,9 +12,31 @@
     "MAYAN_COMMON_EXTRA_APPS={botech.edms}",
   - [x] test
     Need one round of tweaks before using this.
+  - [x] create needed matadata type configuration
   - [ ] test again after tweaking
+    - [x] seems that the font is not included in the package, see manifest
   - [ ] update both edms systems
+    - [ ] create missing metadata type entries in the botech system
   - [ ] app only active in the botech system, not in the private one
+
+- [ ] Case "Already booked" to be improved. At the moment it does just raise an
+  exception. A better interim solution would be to show an error message to the
+  user. This way the user would still have access into the navigation.
+
+- [ ] Improve handling of document type
+      A link might be sufficient. When using "Actions -> Change Type" I am
+      redirected back after storing the new type.
+  - [ ] Adapt form, show type, date and optional description
+  - [ ] Allow to update the type (?) Could also be via action with link back to
+        the same page.
+
+- [ ] Transformations
+  - [ ] Store position information into attributes so that it is possible to
+    manually adjust them for corner cases.
+
+- [ ] Required metadata which does not yet have a value in the database causes
+  the form to fail even though there are sensible default values provided. This
+  should be improved.
 
 - [ ] Add documentation as a Sphinx based document
 
@@ -22,7 +44,6 @@
 
 - [ ] check if file cache can be invalidated when metadata changes so that the
   transformation is applied again.
-
 
 - [ ] Handling of missing metadata in transformation
 
@@ -39,16 +60,6 @@
       "get_document" as well. It also contains an if statement to differentiate
       between the page models. Think this knowledge should not be there.
 
-- [ ] Case "Already booked" to be improved. At the moment it does just raise an
-  exception. A better interim solution would be to show an error message to the
-  user. This way the user would still have access into the navigation.
-
-- [ ] Improve handling of document type
-      A link might be sufficient. When using "Actions -> Change Type" I am
-      redirected back after storing the new type.
-  - [ ] Adapt form, show type, date and optional description
-  - [ ] Allow to update the type (?) Could also be via action with link back to
-        the same page.
 
 
 - [ ] review permission handling
