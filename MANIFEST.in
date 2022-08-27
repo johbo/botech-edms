@@ -1,5 +1,6 @@
 include LICENSE
 include README.rst
+recursive-include botech/edms/fonts *
 recursive-include botech/edms/static *
 recursive-include botech/edms/templates *
 recursive-include docs *
