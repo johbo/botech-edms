@@ -8,6 +8,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
 
 from mayan.apps.acls.models import AccessControlList
+from mayan.apps.converter.layers import layer_decorations
+from mayan.apps.converter.models import (
+    ObjectLayer, LayerTransformation)
 from mayan.apps.converter.transformations import TransformationResize
 from mayan.apps.documents.models import Document
 from mayan.apps.documents.forms.document_forms import DocumentForm, DocumentPropertiesForm
@@ -43,6 +46,7 @@ from .settings import (
     setting_acct_entity,
     setting_acct_fiscal_year,
     setting_acct_number_range)
+from .transformations import TransformationStampAccountingMetadata
 
 
 class AccountingDocumentEditView(
@@ -309,6 +313,7 @@ class AccountingDocumentEditView(
         self.form_valid_metadata(forms['metadata'])
         self.form_valid_comment(forms['comment'])
         self.tag_document_as_booked()
+        self.attach_stamp_accounting_metadata_transformation()
 
 
     def form_valid_metadata(self, form):
@@ -429,6 +434,25 @@ class AccountingDocumentEditView(
                 'Attached booked tag to document %s'
             ) % document, request=self.request)
 
+    def attach_stamp_accounting_metadata_transformation(self):
+        # TODO: Handle the case that this transformation is already attached
+
+        document = self.object
+        active_version = document.versions.filter(active=True).first()
+        first_page = active_version.version_pages.first()
+
+        object_layer, created = ObjectLayer.objects.get_for(
+            layer=layer_decorations, obj=first_page
+        )
+
+        layer_transformation = LayerTransformation(
+            object_layer = object_layer,
+            # TODO: Has to be found out for the given layer
+            order = 1,
+            name = TransformationStampAccountingMetadata.name,
+            arguments = '',
+        )
+        layer_transformation.save()
 
     def _get_booked_tag(self):
         return Tag.objects.get(label=setting_botech_booked_tag.value)
