@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -36,7 +38,11 @@ from .forms import CommentForm
 from .settings import (
     setting_botech_booked_tag,
     setting_acct_assignment,
-    setting_acct_doc_number)
+    setting_acct_booked_date,
+    setting_acct_doc_number,
+    setting_acct_entity,
+    setting_acct_fiscal_year,
+    setting_acct_number_range)
 
 
 class AccountingDocumentEditView(
@@ -257,7 +263,19 @@ class AccountingDocumentEditView(
 
     def get_initial__comment(self):
         document = self.object
-        initial = {}
+        initial = {
+            'booked_date': date.today().isoformat(),
+        }
+
+        metadata_type = MetadataType.objects.get(
+            name=setting_acct_booked_date.value)
+        try:
+            document_metadata = DocumentMetadata.objects.get(
+                metadata_type=metadata_type,
+                document=document)
+            initial['booked_date'] = document_metadata.value
+        except DocumentMetadata.DoesNotExist:
+            pass
 
         metadata_type = MetadataType.objects.get(
             name=setting_acct_assignment.value)
@@ -336,6 +354,9 @@ class AccountingDocumentEditView(
         acct_doc_number = form.cleaned_data['doc_number']
         self._set_acct_doc_number(acct_doc_number)
 
+        acct_booked_date = form.cleaned_data['booked_date']
+        self._set_acct_booked_date(acct_booked_date)
+
         comment_text = form.cleaned_data['text']
         self._set_assignment_comment_if_provided(comment_text)
 
@@ -377,6 +398,18 @@ class AccountingDocumentEditView(
         document_metadata._event_actor = self.request.user
         document_metadata.save()
 
+    def _set_acct_booked_date(self, booked_date):
+        document = self.object
+        metadata_type = MetadataType.objects.get(
+            name=setting_acct_booked_date.value)
+
+        document_metadata, created = DocumentMetadata.objects.get_or_create(
+            metadata_type=metadata_type,
+            document=document)
+        document_metadata.value = booked_date
+        document_metadata._event_actor = self.request.user
+        document_metadata.save()
+
     def tag_document_as_booked(self):
         document = self.object
         booked_tag = self._get_booked_tag()
@@ -414,11 +447,12 @@ class AccountingDocumentEditView(
             user=user
         )
 
-        # TODO: Refactor the forms and the initial methods.
-        metadata = metadata.exclude(
+        # TODO: Use a list of type ids or similar to filter
+        metadata = metadata.filter(
             metadata_type__name__in=[
-                setting_acct_doc_number.value,
-                setting_acct_assignment.value,
+                setting_acct_entity.value,
+                setting_acct_fiscal_year.value,
+                setting_acct_number_range.value,
             ])
 
         return metadata

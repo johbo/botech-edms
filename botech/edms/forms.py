@@ -12,3 +12,7 @@ class CommentForm(forms.Form):
     doc_number = forms.CharField(
         label=_('ACCT Document Number'),
         required=True)
+
+    booked_date = forms.CharField(
+        label=_('ACCT Booked Date'),
+        required=True)
