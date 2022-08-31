@@ -3,22 +3,6 @@
  TODO
 ======
 
-- [ ] docker image which contains the botech package
-  - [x] put repository into Github -> easy download
-  - [x] adapt docker file to install the python package
-  - [x] push to imac via terraform as test-edms
-  - [x] adapt settings
-    So far only the following line was needed:
-    "MAYAN_COMMON_EXTRA_APPS={botech.edms}",
-  - [x] test
-    Need one round of tweaks before using this.
-  - [x] create needed matadata type configuration
-  - [ ] test again after tweaking
-    - [x] seems that the font is not included in the package, see manifest
-  - [ ] update both edms systems
-    - [ ] create missing metadata type entries in the botech system
-  - [ ] app only active in the botech system, not in the private one
-
 - [ ] Case "Already booked" to be improved. At the moment it does just raise an
   exception. A better interim solution would be to show an error message to the
   user. This way the user would still have access into the navigation.
@@ -62,14 +46,20 @@
       "get_document" as well. It also contains an if statement to differentiate
       between the page models. Think this knowledge should not be there.
 
+- [ ] bulk actions in list: Open all checked documents in accounting view, one
+  per tab.
+
+- [ ] partial save of the form. E.g. I have just entered a comment about the
+  accounting assignment and want to save but not yet process this.
+
+- [ ] empty assignment notes -> do not create metadata entry
+  - [ ] skip if empty comment
+  - [ ]
 
 
 - [ ] review permission handling
   - [ ] maybe introduce a specific permission for this form, since it does
         combine quite a few object types.
-
-- [ ] create metadata configuration in dev system. test terraform provider.
-
 
 - [ ] refactor
 
@@ -88,6 +78,24 @@
         assumptions
 
 - [ ] Investigate how to disable file caches for development
+
+- [x] docker image which contains the botech package
+  - [x] put repository into Github -> easy download
+  - [x] adapt docker file to install the python package
+  - [x] push to imac via terraform as test-edms
+  - [x] adapt settings
+    So far only the following line was needed:
+    "MAYAN_COMMON_EXTRA_APPS={botech.edms}",
+  - [x] test
+    Need one round of tweaks before using this.
+  - [x] create needed matadata type configuration
+  - [x] test again after tweaking
+    - [x] seems that the font is not included in the package, see manifest
+  - [x] update both edms systems
+    - [x] create missing metadata type entries in the botech system
+    - [x] adjust metadata names
+    - [x] check that workflows are up to date and activated
+  - [x] app only active in the botech system, not in the private one
 
 - [x] install ipdb into dev environment container
 
