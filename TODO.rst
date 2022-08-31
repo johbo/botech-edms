@@ -53,8 +53,11 @@
   accounting assignment and want to save but not yet process this.
 
 - [ ] empty assignment notes -> do not create metadata entry
-  - [ ] skip if empty comment
-  - [ ]
+  - Note: Has to be created if an entry already exists, if not then skipping is
+    save.
+
+- [ ] metadata, avoid get_or_create in booked date entry. This does create
+  double events, compare the assignment note.
 
 
 - [ ] review permission handling
