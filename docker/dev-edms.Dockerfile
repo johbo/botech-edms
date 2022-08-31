@@ -21,6 +21,7 @@ RUN set -x \
         libsasl2-dev \
         # ENDTODO make ...
         make \
+        python3-ipdb \
         python3-pip \
         python3-venv \
         sudo \
