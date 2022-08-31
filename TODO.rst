@@ -33,10 +33,12 @@
 - [ ] Transformations
   - [ ] Store position information into attributes so that it is possible to
     manually adjust them for corner cases.
+  - [ ] fallback to current values as defaults
 
 - [ ] Required metadata which does not yet have a value in the database causes
   the form to fail even though there are sensible default values provided. This
   should be improved.
+  - Workaround by checking the "update" checkbox possible
 
 - [ ] Add documentation as a Sphinx based document
 
@@ -76,8 +78,6 @@
 
 - [ ] Menu Entry "Accounting" for documents in sub navigation would be nice.
 
-- [ ] install ipdb into dev environment container
-
 - [ ] special tag handling
     - if already tagged, show at least a warning
     - what happens if already tagged and the form is submitted
@@ -88,6 +88,8 @@
         assumptions
 
 - [ ] Investigate how to disable file caches for development
+
+- [x] install ipdb into dev environment container
 
 - [x] Add an accounting decoration to show accounting related information
       like a stamp on the document. This might be doable when using the decorations or
