@@ -396,9 +396,15 @@ class AccountingDocumentEditView(
         metadata_type = MetadataType.objects.get(
             name=setting_acct_assignment.value)
 
-        document_metadata, created = DocumentMetadata.objects.get_or_create(
-            metadata_type=metadata_type,
-            document=document)
+        try:
+            document_metadata = DocumentMetadata.objects.get(
+                metadata_type=metadata_type,
+                document=document)
+        except DocumentMetadata.DoesNotExist:
+            document_metadata = DocumentMetadata(
+                metadata_type=metadata_type,
+                document=document)
+
         document_metadata.value = comment_text
         document_metadata._event_actor = self.request.user
         document_metadata.save()
