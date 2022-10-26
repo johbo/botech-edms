@@ -26,7 +26,6 @@ from mayan.apps.documents.settings import (
     setting_preview_width)
 from mayan.apps.document_comments.models import Comment
 from mayan.apps.metadata.api import save_metadata_list
-from mayan.apps.metadata.forms import DocumentMetadataFormSet
 from mayan.apps.metadata.models import DocumentMetadata, MetadataType
 from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
@@ -40,7 +39,7 @@ from mayan.apps.views.mixins import (
 from mayan.apps.views.generics import (
     ConfirmView, MultiFormView, MultipleObjectFormActionView)
 
-from .forms import CommentForm, DocumentForm
+from .forms import CommentForm, DocumentForm, DocumentMetadataFormSet
 from .settings import (
     setting_botech_booked_tag,
     setting_acct_assignment,
@@ -501,18 +500,20 @@ class PreProcessDocumentEditView(
     """
 
     form_classes = {
-        'properties': DocumentForm,
-        'preview': DocumentVersionPreviewForm,
         'cabinets': CabinetListForm,
+        'metadata': DocumentMetadataFormSet,
+        'preview': DocumentVersionPreviewForm,
+        'properties': DocumentForm,
         'tags': TagMultipleSelectionForm,
     }
     skip_form_validation = {
         'preview',
     }
     prefixes = {
-        'properties': 'properties',
-        'preview': 'preview',
         'cabinets': 'cabinets',
+        'metadata': DocumentMetadataFormSet,
+        'preview': 'preview',
+        'properties': 'properties',
         'tags': 'tags',
     }
 
@@ -608,6 +609,59 @@ class PreProcessDocumentEditView(
             'cabinets': document.cabinets.all(),
         }
 
+    def get_initial__metadata(self):
+        document = self.object
+        user = self.request.user
+
+        metadata_queryset = AccessControlList.objects.restrict_queryset(
+            queryset=document.metadata.all(),
+            permission=permission_document_metadata_edit,
+            user=user
+        )
+        existing_metadata_types = set()
+        metadata = {}
+
+        # TODO: The handling looks very complicated and may be due to the
+        # "multi document" support in the edit metadata view. There is no
+        # reason why for a single document there could ever by two values for a
+        # given metadata type.
+        for document_metadata in metadata_queryset:
+            existing_metadata_types.add(document_metadata.metadata_type)
+            # Metadata value cannot be None here, fallback to an empty
+            # string
+            value = document_metadata.value or ''
+            if document_metadata.metadata_type in metadata:
+                if value not in metadata[document_metadata.metadata_type]:
+                    metadata[document_metadata.metadata_type].append(value)
+            else:
+                metadata[document_metadata.metadata_type] = [value] if value else ''
+
+        # TODO: Check if this can be made in a more efficient query
+        all_metadata_types = set(
+            dtmt.metadata_type for dtmt in document.document_type.metadata.all())
+        addable_metadata_types = all_metadata_types - existing_metadata_types
+
+        for metadata_type in addable_metadata_types:
+            metadata[metadata_type] = ''
+
+        def value_to_initial(value):
+            return ', '.join(value) if value else ''
+
+        initial = []
+        for key, value in metadata.items():
+            value = value_to_initial(value)
+            # TODO: Why can the form not get the document_metadata object?
+            initial.append(
+                {
+                    'document_type': document.document_type,
+                    'metadata_type': key,
+                    'update': False,
+                    'value': value,
+                    'value_existing': value
+                }
+            )
+        return initial
+
     def get_initial__tags(self):
         document = self.object
         return {
@@ -655,6 +709,14 @@ class PreProcessDocumentEditView(
                     'context': {
                         'form': forms['tags'],
                         'title': _('Document tags'),
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
+                        'form': forms['metadata'],
+                        'form_display_mode_table': True,
+                        'title': _('Document metadata'),
                     },
                 },
                 {

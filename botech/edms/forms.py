@@ -1,8 +1,10 @@
 from django import forms
+from django.forms.formsets import formset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from mayan.apps.documents.models.document_models import Document
 from mayan.apps.documents.utils import get_language_choices
+from mayan.apps.metadata.forms import DocumentMetadataForm as BaseDocumentMetadataForm
 
 
 class CommentForm(forms.Form):
@@ -39,3 +41,12 @@ class DocumentForm(forms.ModelForm):
                 'class': 'select2'
             }
         )
+
+
+class DocumentMetadataForm(BaseDocumentMetadataForm):
+
+    remove = forms.BooleanField(
+        initial=False, label=_('Remove'), required=False
+    )
+
+DocumentMetadataFormSet = formset_factory(form=DocumentMetadataForm, extra=0)
