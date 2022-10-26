@@ -3,7 +3,10 @@ from django.apps import apps
 from mayan.apps.common.apps import MayanAppConfig
 from mayan.apps.common.menus import menu_object
 
-from .links import link_acct_document_edit_view
+from .links import (
+    link_acct_document_edit_view,
+    link_pre_process_document_edit_view,
+)
 
 
 class BotechEdmsConfig(MayanAppConfig):
@@ -20,5 +23,11 @@ class BotechEdmsConfig(MayanAppConfig):
         menu_object.bind_links(
             links=(
                 link_acct_document_edit_view,
+            ), sources=(Document,)
+        )
+
+        menu_object.bind_links(
+            links=(
+                link_pre_process_document_edit_view,
             ), sources=(Document,)
         )

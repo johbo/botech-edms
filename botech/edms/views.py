@@ -488,6 +488,111 @@ class AccountingDocumentEditView(
         return metadata
 
 
+class PreProcessDocumentEditView(
+        RestrictedQuerysetViewMixin,
+        SingleObjectMixin,
+        RedirectionViewMixin,
+        MultiFormView):
+    """
+    Specialized view to support the pre processing workflow.
+    """
+
+    form_classes = {
+        'properties': DocumentPropertiesForm,
+        'preview': DocumentVersionPreviewForm,
+    }
+    skip_form_validation = {
+        'properties',
+        'preview',
+    }
+    prefixes = {
+        'properties': 'properties',
+        'preview': 'preview',
+    }
+
+    object_permission = permission_document_edit
+    pk_url_kwarg = 'document_id'
+    source_queryset = Document.valid.all()
+    template_name = 'botech/appearance/generic_form_group.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Note: SingleObjectMixin depends on this to render the context. Even
+        # though it does define "get_object()", it is not using it.
+        self.object = self.get_object()
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        forms_to_validate = [form for name, form in self.forms.items()
+                 if name not in self.skip_form_validation]
+        if all([form.is_valid() for form in forms_to_validate]):
+            return self.forms_valid(forms=self.forms)
+        else:
+            return self.forms_invalid(forms=self.forms)
+
+    def get_form_extra_kwargs__properties(self):
+        document = self.get_object()
+        return {
+            'instance': document,
+        }
+
+    def get_form_extra_kwargs__preview(self):
+        transformation_instance_list = (
+            TransformationResize(
+                height=setting_preview_height.value,
+                width=setting_preview_width.value
+            ),
+        )
+
+        return {
+            'instance': self.object,
+            'transformation_instance_list': transformation_instance_list
+        }
+
+    def get_success_url(self):
+        document_id = self._get_document_id_from_request()
+
+        return reverse(
+            viewname='documents:document_preview', kwargs={
+                'document_id': document_id,
+            }
+        )
+
+    def _get_document_id_from_request(self):
+        document_id = self.kwargs.get(self.pk_url_kwarg)
+        return document_id
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        document = self.object
+        forms = context['forms']
+
+        context.update({
+            'title': _('Pre process document'),
+            'subtitle': document.label,
+            'subtemplates_list': [
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
+                        'form': forms['properties'],
+                        'title': _('Document properties'),
+                        'read_only': True,
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
+                        'form': forms['preview'],
+                        'title': _('Document preview'),
+                        'object': document,
+                        'hide_labels': True,
+                    },
+                },
+            ]
+        })
+        return context
+
+
 def _exception_to_message(error):
     """
     Transform a given exception to a message.
