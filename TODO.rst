@@ -11,23 +11,35 @@ Typical context: Bulk added documents need a pre-processing: Set a document
 type, fill metadata, sort into cabinets and sometimes set tags. Currently this
 is a multi step process.
 
-- [ ] Add a custom action to jump into the specialized view
+- [x] Add a custom action to jump into the specialized view
 
-- [ ] Have a view which shows the properties and a preview, steal part from
+- [x] Have a view which shows the properties and a preview, steal part from
   accounting support form.
 
-- [ ] Allow to adjust the document type and the description
+- [x] Allow to adjust the document type and the description
 
-- [ ] Allow to update cabinets
+- [x] Allow to update cabinets
+  - [x] find cabinets form
+  - [x] support add and save
+  - [x] display existing cabinets
+  - [x] allow to remove
+
+- [x] Allow to update tags
+  - [x] find tags update form
+  - [x] display tags
+  - [x] save changes
+
+- [x] (?) Consider to allow updating the label of the document
 
 - [ ] Allow to update metadata
 
 - [ ] Changing the document type has to trigger an update of the metadata form
 
-- [ ] Allow to update tags
+- [ ] Refactor, move "self.object" fix from "dispatch" into a separate Mixin to avoid duplication.
 
-- [ ] (?) Consider to allow updating the label of the document
+- [ ] Refactor "self.post", it's duplicated from the accounting form.
 
+- [ ] Record an event when the view is used (compare to "document viewed")
 
 
 
