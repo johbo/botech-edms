@@ -8,6 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
 
 from mayan.apps.acls.models import AccessControlList
+from mayan.apps.cabinets.forms import CabinetListForm
+from mayan.apps.cabinets.models import Cabinet
 from mayan.apps.converter.layers import layer_decorations
 from mayan.apps.converter.models import (
     ObjectLayer, LayerTransformation)
@@ -500,6 +502,7 @@ class PreProcessDocumentEditView(
     form_classes = {
         'properties': DocumentForm,
         'preview': DocumentVersionPreviewForm,
+        'cabinets': CabinetListForm,
     }
     skip_form_validation = {
         'preview',
@@ -507,6 +510,7 @@ class PreProcessDocumentEditView(
     prefixes = {
         'properties': 'properties',
         'preview': 'preview',
+        'cabinets': 'cabinets',
     }
 
     object_permission = permission_document_edit
@@ -531,6 +535,24 @@ class PreProcessDocumentEditView(
 
     def all_forms_valid(self, forms):
         forms['properties'].save()
+        self.form_valid_cabinets(forms['cabinets'])
+
+    def form_valid_cabinets(self, form):
+        document = self.get_object()
+        current_cabinets = set(document.cabinets.all())
+        target_cabinets = set(form.cleaned_data['cabinets'])
+
+        to_remove = current_cabinets - target_cabinets
+        to_add = target_cabinets - current_cabinets
+
+        for cabinet in to_remove:
+            cabinet._event_actor = self.request.user
+            cabinet.document_remove(document)
+
+        for cabinet in to_add:
+            cabinet._event_actor = self.request.user
+            cabinet.document_add(document)
+
 
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
@@ -550,6 +572,18 @@ class PreProcessDocumentEditView(
             'instance': self.object,
             'transformation_instance_list': transformation_instance_list
         }
+
+    def get_form_extra_kwargs__cabinets(self):
+        return {
+            'queryset': Cabinet.objects.all(),
+        }
+
+    def get_initial__cabinets(self):
+        document = self.object
+        return {
+            'cabinets': document.cabinets.all(),
+        }
+
 
     def get_success_url(self):
         document_id = self._get_document_id_from_request()
@@ -578,6 +612,13 @@ class PreProcessDocumentEditView(
                     'context': {
                         'form': forms['properties'],
                         'title': _('Document properties'),
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
+                        'form': forms['cabinets'],
+                        'title': _('Document cabinets'),
                     },
                 },
                 {
