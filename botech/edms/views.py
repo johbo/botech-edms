@@ -31,6 +31,7 @@ from mayan.apps.metadata.models import DocumentMetadata, MetadataType
 from mayan.apps.metadata.permissions import (
     permission_document_metadata_edit,
     permission_document_metadata_remove)
+from mayan.apps.tags.forms import TagMultipleSelectionForm
 from mayan.apps.tags.models import Tag
 from mayan.apps.views.mixins import (
     MultipleObjectViewMixin,
@@ -503,6 +504,7 @@ class PreProcessDocumentEditView(
         'properties': DocumentForm,
         'preview': DocumentVersionPreviewForm,
         'cabinets': CabinetListForm,
+        'tags': TagMultipleSelectionForm,
     }
     skip_form_validation = {
         'preview',
@@ -511,6 +513,7 @@ class PreProcessDocumentEditView(
         'properties': 'properties',
         'preview': 'preview',
         'cabinets': 'cabinets',
+        'tags': 'tags',
     }
 
     object_permission = permission_document_edit
@@ -536,6 +539,7 @@ class PreProcessDocumentEditView(
     def all_forms_valid(self, forms):
         forms['properties'].save()
         self.form_valid_cabinets(forms['cabinets'])
+        self.form_valid_tags(forms['tags'])
 
     def form_valid_cabinets(self, form):
         document = self.get_object()
@@ -553,6 +557,21 @@ class PreProcessDocumentEditView(
             cabinet._event_actor = self.request.user
             cabinet.document_add(document)
 
+    def form_valid_tags(self, form):
+        document = self.get_object()
+        current_tags= set(document.tags.all())
+        target_tags = set(form.cleaned_data['tags'])
+
+        to_remove = current_tags - target_tags
+        to_add = target_tags - current_tags
+
+        for tag in to_remove:
+            tag._event_actor = self.request.user
+            tag.remove_from(document)
+
+        for tag in to_add:
+            tag._event_actor = self.request.user
+            tag.attach_to(document)
 
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
@@ -578,12 +597,22 @@ class PreProcessDocumentEditView(
             'queryset': Cabinet.objects.all(),
         }
 
+    def get_form_extra_kwargs__tags(self):
+        return {
+            'queryset': Tag.objects.all(),
+        }
+
     def get_initial__cabinets(self):
         document = self.object
         return {
             'cabinets': document.cabinets.all(),
         }
 
+    def get_initial__tags(self):
+        document = self.object
+        return {
+            'tags': document.tags.all(),
+        }
 
     def get_success_url(self):
         document_id = self._get_document_id_from_request()
@@ -619,6 +648,13 @@ class PreProcessDocumentEditView(
                     'context': {
                         'form': forms['cabinets'],
                         'title': _('Document cabinets'),
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
+                        'form': forms['tags'],
+                        'title': _('Document tags'),
                     },
                 },
                 {
