@@ -540,10 +540,24 @@ class PreProcessDocumentEditView(
             return self.forms_invalid(forms=self.forms)
 
     def all_forms_valid(self, forms):
-        forms['properties'].save()
+        self.form_valid_properties(forms['properties'])
         self.form_valid_cabinets(forms['cabinets'])
         self.form_valid_tags(forms['tags'])
         self.form_valid_metadata(forms['metadata'])
+
+    def form_valid_properties(self, form):
+        # Note: Manually save by intention since changing the document type has
+        # to call a special method on the instance.
+        document = self.get_object()
+        user = self.request.user
+
+        # Note: The form.instance contains already the modified values after
+        # the call to ModelForm.clean, that's why we use the instance from self.object
+        new_document_type = form.cleaned_data['document_type']
+        document.document_type_change(
+            new_document_type, _user=user)
+
+        form.save()
 
     def form_valid_cabinets(self, form):
         document = self.get_object()
