@@ -26,12 +26,7 @@ def save_metadata(metadata_dict, document, create=False, _user=None):
             document_metadata.save()
     else:
         try:
-            document_metadata = DocumentMetadata.objects.get(
-                document=document,
-                metadata_type=get_object_or_404(
-                    klass=MetadataType, pk=metadata_dict['metadata_type_id']
-                ),
-            )
+            document_metadata = DocumentMetadata.objects.get(**parameters)
         except DocumentMetadata.DoesNotExist:
             document_metadata = None
 
