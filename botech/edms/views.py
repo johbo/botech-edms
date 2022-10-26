@@ -13,7 +13,7 @@ from mayan.apps.converter.models import (
     ObjectLayer, LayerTransformation)
 from mayan.apps.converter.transformations import TransformationResize
 from mayan.apps.documents.models import Document
-from mayan.apps.documents.forms.document_forms import DocumentForm, DocumentPropertiesForm
+from mayan.apps.documents.forms.document_forms import DocumentPropertiesForm
 from mayan.apps.documents.forms.document_type_forms import DocumentTypeFilteredSelectForm
 from mayan.apps.documents.forms.document_version_forms import (
     DocumentVersionPreviewForm)
@@ -37,7 +37,7 @@ from mayan.apps.views.mixins import (
 from mayan.apps.views.generics import (
     ConfirmView, MultiFormView, MultipleObjectFormActionView)
 
-from .forms import CommentForm
+from .forms import CommentForm, DocumentForm
 from .settings import (
     setting_botech_booked_tag,
     setting_acct_assignment,
@@ -498,11 +498,10 @@ class PreProcessDocumentEditView(
     """
 
     form_classes = {
-        'properties': DocumentPropertiesForm,
+        'properties': DocumentForm,
         'preview': DocumentVersionPreviewForm,
     }
     skip_form_validation = {
-        'properties',
         'preview',
     }
     prefixes = {
@@ -529,6 +528,9 @@ class PreProcessDocumentEditView(
             return self.forms_valid(forms=self.forms)
         else:
             return self.forms_invalid(forms=self.forms)
+
+    def all_forms_valid(self, forms):
+        forms['properties'].save()
 
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
@@ -576,7 +578,6 @@ class PreProcessDocumentEditView(
                     'context': {
                         'form': forms['properties'],
                         'title': _('Document properties'),
-                        'read_only': True,
                     },
                 },
                 {

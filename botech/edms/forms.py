@@ -1,6 +1,9 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+from mayan.apps.documents.models.document_models import Document
+from mayan.apps.documents.utils import get_language_choices
+
 
 class CommentForm(forms.Form):
 
@@ -16,3 +19,23 @@ class CommentForm(forms.Form):
     booked_date = forms.CharField(
         label=_('ACCT Booked Date'),
         required=True)
+
+
+class DocumentForm(forms.ModelForm):
+
+    class Meta:
+        fields = ('document_type', 'label', 'description', 'language')
+        model = Document
+        widgets = {
+            'document_type': forms.Select(
+                attrs={'class': 'select2'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['language'].widget = forms.Select(
+            choices=get_language_choices(), attrs={
+                'class': 'select2'
+            }
+        )
