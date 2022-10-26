@@ -19,7 +19,7 @@ def save_metadata(metadata_dict, document, create=False, _user=None):
     if create:
         # Use matched metadata now to create document metadata.
         try:
-            DocumentMetadata.objects.get(**parameters)
+            document_metadata = DocumentMetadata.objects.get(**parameters)
         except DocumentMetadata.DoesNotExist:
             document_metadata = DocumentMetadata(**parameters)
             document_metadata._event_actior = _user
