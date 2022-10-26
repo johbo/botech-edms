@@ -3,6 +3,37 @@
  TODO
 ======
 
+
+Pre processing
+==============
+
+Typical context: Bulk added documents need a pre-processing: Set a document
+type, fill metadata, sort into cabinets and sometimes set tags. Currently this
+is a multi step process.
+
+- [ ] Add a custom action to jump into the specialized view
+
+- [ ] Have a view which shows the properties and a preview, steal part from
+  accounting support form.
+
+- [ ] Allow to adjust the document type and the description
+
+- [ ] Allow to update cabinets
+
+- [ ] Allow to update metadata
+
+- [ ] Changing the document type has to trigger an update of the metadata form
+
+- [ ] Allow to update tags
+
+- [ ] (?) Consider to allow updating the label of the document
+
+
+
+
+Accounting support
+==================
+
 - [ ] Case "Already booked" to be improved. At the moment it does just raise an
   exception. A better interim solution would be to show an error message to the
   user. This way the user would still have access into the navigation.
