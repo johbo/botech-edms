@@ -329,6 +329,7 @@ class AccountingDocumentEditView(
                 if metadata_queryset.filter(
                         metadata_type=form.cleaned_data['metadata_type_id']).exists():
                     try:
+                        # TODO: Use save_metadata directly and simplify
                         save_metadata_list(
                             metadata_list=[form.cleaned_data], document=document,
                             _user=self.request.user
