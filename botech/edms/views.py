@@ -39,6 +39,7 @@ from mayan.apps.views.mixins import (
 from mayan.apps.views.generics import (
     ConfirmView, MultiFormView, MultipleObjectFormActionView)
 
+from .fixes import save_metadata
 from .forms import CommentForm, DocumentForm, DocumentMetadataFormSet
 from .settings import (
     setting_botech_booked_tag,
@@ -541,6 +542,7 @@ class PreProcessDocumentEditView(
         forms['properties'].save()
         self.form_valid_cabinets(forms['cabinets'])
         self.form_valid_tags(forms['tags'])
+        self.form_valid_metadata(forms['metadata'])
 
     def form_valid_cabinets(self, form):
         document = self.get_object()
@@ -573,6 +575,45 @@ class PreProcessDocumentEditView(
         for tag in to_add:
             tag._event_actor = self.request.user
             tag.attach_to(document)
+
+    def form_valid_metadata(self, form):
+        document = self.object
+        errors = []
+        for form in form.forms:
+            if form.cleaned_data['update']:
+                try:
+                    save_metadata(
+                        metadata_dict=form.cleaned_data, document=document,
+                        create=True, _user=self.request.user
+                    )
+                except Exception as exception:
+                    errors.append(exception)
+
+                    if settings.DEBUG or settings.TESTING:
+                        raise
+            elif form.cleaned_data['remove']:
+                try:
+                    document_metadata = document.metadata.get(
+                        metadata_type=form.cleaned_data['metadata_type_id'])
+                    document_metadata._event_actor = self.request.user
+                    document_metadata.delete()
+                except DocumentMetadata.DoesNotExist:
+                    # TODO: Double check if it's save to ignore this or if a special
+                    # handling might be required here.
+                    pass
+
+        for error in errors:
+            exception_message = _exception_to_message(error)
+
+            messages.error(
+                message=_(
+                    'Error editing metadata for document: '
+                    '%(document)s; %(exception)s.'
+                ) % {
+                    'document': document,
+                    'exception': exception_message
+                }, request=self.request
+            )
 
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
