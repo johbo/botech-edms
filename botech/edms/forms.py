@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms.formsets import formset_factory
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,5 +49,24 @@ class DocumentMetadataForm(BaseDocumentMetadataForm):
     remove = forms.BooleanField(
         initial=False, label=_('Remove'), required=False
     )
+
+    def clean(self):
+        super().clean()
+
+        metadata_type = getattr(self, 'metadata_type', None)
+        if metadata_type:
+            required = metadata_type.get_required_for(
+                document_type=self.document_type
+            )
+            if required and self.cleaned_data.get('remove'):
+                raise ValidationError({
+                    'value': _(
+                        '"{}" is required for this document type.'.format(
+                            metadata_type.label)
+                    )
+                })
+
+        return self.cleaned_data
+
 
 DocumentMetadataFormSet = formset_factory(form=DocumentMetadataForm, extra=0)
