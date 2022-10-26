@@ -5,6 +5,11 @@ services:
     build:
       context: .
       dockerfile: ./dev-edms.Dockerfile
+    entrypoint: /bin/sh -c
+    command:
+      - |
+        . ~/venv/bin/activate
+        ~/src/mayan-edms/manage.py runserver --settings=botech.edms_dev.settings 0.0.0.0:8000
     ports:
       - "8000:8000"
     volumes:
