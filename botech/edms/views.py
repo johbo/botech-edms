@@ -653,13 +653,14 @@ class PreProcessDocumentEditView(
         user = self.request.user
         text = form.cleaned_data['text']
 
-        comment = Comment(
-            document=document,
-            user=user,
-            text=text,
-        )
-        comment._event_actor = user
-        comment.save()
+        if text:
+            comment = Comment(
+                document=document,
+                user=user,
+                text=text,
+            )
+            comment._event_actor = user
+            comment.save()
 
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
