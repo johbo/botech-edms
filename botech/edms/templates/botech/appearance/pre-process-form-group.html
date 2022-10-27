@@ -1,0 +1,10 @@
+{% extends 'botech/appearance/generic_form_group.html' %}
+
+{% block javascript %}
+  {# TODO: Ouch! It makes the form usable, still, needs a proper approach #}
+  <script>
+    $("#id_properties-document_type").change(function() {
+      $('[name="button-refresh-document-type"]').click();
+    });
+  </script>
+{% endblock %}

@@ -3,6 +3,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
@@ -522,7 +523,7 @@ class PreProcessDocumentEditView(
     object_permission = permission_document_edit
     pk_url_kwarg = 'document_id'
     source_queryset = Document.valid.all()
-    template_name = 'botech/appearance/generic_form_group.html'
+    template_name = 'botech/appearance/pre-process-form-group.html'
 
     def dispatch(self, request, *args, **kwargs):
         # Note: SingleObjectMixin depends on this to render the context. Even
@@ -532,12 +533,25 @@ class PreProcessDocumentEditView(
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        # TODO: Implement a better solution to update only the document type so
+        # that the remainder of the form works.
+        if 'button-refresh-document-type' in request.POST:
+            return self.post_refresh_document_type(request, *args, **kwargs)
+
         forms_to_validate = [form for name, form in self.forms.items()
                  if name not in self.skip_form_validation]
         if all([form.is_valid() for form in forms_to_validate]):
             return self.forms_valid(forms=self.forms)
         else:
             return self.forms_invalid(forms=self.forms)
+
+    def post_refresh_document_type(self, request, *args, **kwargs):
+        form = self.forms['properties']
+        if form.is_valid():
+            self.form_valid_properties(form)
+        else:
+            return self.forms_invalid(forms=[form])
+        return HttpResponseRedirect(request.get_full_path())
 
     def all_forms_valid(self, forms):
         self.form_valid_properties(forms['properties'])
@@ -745,6 +759,12 @@ class PreProcessDocumentEditView(
         context.update({
             'title': _('Pre process document'),
             'subtitle': document.label,
+            'extra_buttons': [
+                {
+                    'name': 'button-refresh-document-type',
+                    'label': _('Refresh document type'),
+                },
+            ],
             'subtemplates_list': [
                 {
                     'name': 'botech/appearance/generic_form_group_subtemplate.html',
