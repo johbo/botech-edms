@@ -3,6 +3,66 @@
  TODO
 ======
 
+
+Pre processing
+==============
+
+Typical context: Bulk added documents need a pre-processing: Set a document
+type, fill metadata, sort into cabinets and sometimes set tags. Currently this
+is a multi step process.
+
+- [x] Add a custom action to jump into the specialized view
+
+- [x] Have a view which shows the properties and a preview, steal part from
+  accounting support form.
+
+- [x] Allow to adjust the document type and the description
+
+- [x] Allow to update cabinets
+  - [x] find cabinets form
+  - [x] support add and save
+  - [x] display existing cabinets
+  - [x] allow to remove
+
+- [x] Allow to update tags
+  - [x] find tags update form
+  - [x] display tags
+  - [x] save changes
+
+- [x] (?) Consider to allow updating the label of the document
+
+- [x] Allow to update metadata
+
+- [x] Changing the document type has to trigger an update of the metadata form
+  - [x] changing the document type has to trigger metadata changes
+  - [x] find approach, or at least interim approach
+
+    The interim approach could be a two step process: First select the document
+    type, then allow to update all other fields.
+
+    An alternative would be to trigger a POST when the type is changed, so that
+    the form will be updated based on server side rendering.
+
+  - [x] Automatically update the form when changing the document type. Aim for a
+    POST to a special view endpoint so that only the type can be changed. Then
+    show the form again.
+
+- [ ] Find a solid implementation for the workaround of handling changes of the document type.
+
+- [ ] Fix the issue around "update" and "remove" both being automatically
+  selected in the metadata section.
+
+- [ ] Refactor, move "self.object" fix from "dispatch" into a separate Mixin to avoid duplication.
+
+- [ ] Refactor "self.post", it's duplicated from the accounting form.
+
+- [ ] Record an event when the view is used (compare to "document viewed")
+
+
+
+Accounting support
+==================
+
 - [ ] Case "Already booked" to be improved. At the moment it does just raise an
   exception. A better interim solution would be to show an error message to the
   user. This way the user would still have access into the navigation.
