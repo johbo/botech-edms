@@ -11,6 +11,29 @@ Typical context: Bulk added documents need a pre-processing: Set a document
 type, fill metadata, sort into cabinets and sometimes set tags. Currently this
 is a multi step process.
 
+- [ ] Move preview to the top
+
+- [ ] Add a comment field which can optionally add a comment
+
+- [ ] Consider to change the success url so that the form is shown again. This
+  allows to check the results and is important especially as long as the form
+  handling is still very fragile.
+
+- [ ] Work out the race conditions around cabinets and tags
+
+  Changing the document type does trigger a workflow which does update the
+  cabinets. This workflow is triggered asynchronously and can lead to a
+  situation where the document is added into a cabinet by a workflow, and then
+  removed after submit because the cabinet form does not yet contain the value.
+
+  This means that the cabinets widget has to track which cabinets the user wants
+  to add and to remove, and not change anything else. Then changes which have
+  been made in parallel will not be reverted accidentally by the form.
+
+  The same problem is likely present for the tags.
+
+- [ ] Find a way to process a bunch of documents from a list
+
 - [ ] Find a solid implementation for the workaround of handling changes of the document type.
 
 - [ ] Fix the issue around "update" and "remove" both being automatically
@@ -26,6 +49,9 @@ is a multi step process.
 
 Accounting support
 ==================
+
+- [ ] Fix accounting module: Existing document number is allowed in the case of
+  a bank account statement. Compare case "already booked".
 
 - [ ] Case "Already booked" to be improved. At the moment it does just raise an
   exception. A better interim solution would be to show an error message to the
