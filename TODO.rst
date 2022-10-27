@@ -15,6 +15,10 @@ is a multi step process.
 
 - [x] Add a comment field which can optionally add a comment
 
+- [x] Do not create empty comments
+
+- [x] Fix order of entries in the document type input
+
 - [ ] Consider to change the success url so that the form is shown again. This
   allows to check the results and is important especially as long as the form
   handling is still very fragile.
