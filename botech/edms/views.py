@@ -769,6 +769,15 @@ class PreProcessDocumentEditView(
                 {
                     'name': 'botech/appearance/generic_form_group_subtemplate.html',
                     'context': {
+                        'form': forms['preview'],
+                        'title': _('Document preview'),
+                        'object': document,
+                        'hide_labels': True,
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
                         'form': forms['properties'],
                         'title': _('Document properties'),
                     },
@@ -793,15 +802,6 @@ class PreProcessDocumentEditView(
                         'form': forms['metadata'],
                         'form_display_mode_table': True,
                         'title': _('Document metadata'),
-                    },
-                },
-                {
-                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
-                    'context': {
-                        'form': forms['preview'],
-                        'title': _('Document preview'),
-                        'object': document,
-                        'hide_labels': True,
                     },
                 },
             ]
