@@ -31,9 +31,26 @@ is a multi step process.
 
 - [x] (?) Consider to allow updating the label of the document
 
-- [ ] Allow to update metadata
+- [x] Allow to update metadata
 
-- [ ] Changing the document type has to trigger an update of the metadata form
+- [x] Changing the document type has to trigger an update of the metadata form
+  - [x] changing the document type has to trigger metadata changes
+  - [x] find approach, or at least interim approach
+
+    The interim approach could be a two step process: First select the document
+    type, then allow to update all other fields.
+
+    An alternative would be to trigger a POST when the type is changed, so that
+    the form will be updated based on server side rendering.
+
+  - [x] Automatically update the form when changing the document type. Aim for a
+    POST to a special view endpoint so that only the type can be changed. Then
+    show the form again.
+
+- [ ] Find a solid implementation for the workaround of handling changes of the document type.
+
+- [ ] Fix the issue around "update" and "remove" both being automatically
+  selected in the metadata section.
 
 - [ ] Refactor, move "self.object" fix from "dispatch" into a separate Mixin to avoid duplication.
 
