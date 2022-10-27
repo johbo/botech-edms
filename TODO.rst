@@ -11,9 +11,9 @@ Typical context: Bulk added documents need a pre-processing: Set a document
 type, fill metadata, sort into cabinets and sometimes set tags. Currently this
 is a multi step process.
 
-- [ ] Move preview to the top
+- [x] Move preview to the top
 
-- [ ] Add a comment field which can optionally add a comment
+- [x] Add a comment field which can optionally add a comment
 
 - [ ] Consider to change the success url so that the form is shown again. This
   allows to check the results and is important especially as long as the form
