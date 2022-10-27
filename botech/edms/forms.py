@@ -4,6 +4,7 @@ from django.forms.formsets import formset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from mayan.apps.documents.models.document_models import Document
+from mayan.apps.documents.models.document_type_models import DocumentType
 from mayan.apps.documents.utils import get_language_choices
 from mayan.apps.metadata.forms import DocumentMetadataForm as BaseDocumentMetadataForm
 
@@ -34,13 +35,18 @@ class OptionalCommentForm(forms.Form):
 
 class DocumentForm(forms.ModelForm):
 
+    document_type = forms.ModelChoiceField(
+        required=True,
+        empty_label=None,
+        label=_('Document type'),
+        help_text=_('Changes are applied automatically and the form will be reloaded.'),
+        queryset=DocumentType.objects.order_by('label'),
+        widget=forms.Select(attrs={'class': 'select2'}),
+    )
+
     class Meta:
         fields = ('document_type', 'label', 'description', 'language')
         model = Document
-        widgets = {
-            'document_type': forms.Select(
-                attrs={'class': 'select2'}),
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
