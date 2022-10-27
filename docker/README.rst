@@ -8,6 +8,7 @@ Bring the dev server up
 =======================
 
 ::
+
    docker compose up
 
 Note that you may have to initialize the python venv manually, see the
