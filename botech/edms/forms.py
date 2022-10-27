@@ -24,6 +24,14 @@ class CommentForm(forms.Form):
         required=True)
 
 
+class OptionalCommentForm(forms.Form):
+
+    text = forms.CharField(
+        label=_('Comment'),
+        required=False,
+        widget=forms.Textarea)
+
+
 class DocumentForm(forms.ModelForm):
 
     class Meta:

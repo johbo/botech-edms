@@ -41,7 +41,8 @@ from mayan.apps.views.generics import (
     ConfirmView, MultiFormView, MultipleObjectFormActionView)
 
 from .fixes import save_metadata
-from .forms import CommentForm, DocumentForm, DocumentMetadataFormSet
+from .forms import (
+    CommentForm, OptionalCommentForm, DocumentForm, DocumentMetadataFormSet)
 from .settings import (
     setting_botech_booked_tag,
     setting_acct_assignment,
@@ -504,6 +505,7 @@ class PreProcessDocumentEditView(
 
     form_classes = {
         'cabinets': CabinetListForm,
+        'comment': OptionalCommentForm,
         'metadata': DocumentMetadataFormSet,
         'preview': DocumentVersionPreviewForm,
         'properties': DocumentForm,
@@ -514,6 +516,7 @@ class PreProcessDocumentEditView(
     }
     prefixes = {
         'cabinets': 'cabinets',
+        'comment': 'comment',
         'metadata': DocumentMetadataFormSet,
         'preview': 'preview',
         'properties': 'properties',
@@ -558,6 +561,7 @@ class PreProcessDocumentEditView(
         self.form_valid_cabinets(forms['cabinets'])
         self.form_valid_tags(forms['tags'])
         self.form_valid_metadata(forms['metadata'])
+        self.form_valid_comment(forms['comment'])
 
     def form_valid_properties(self, form):
         # Note: Manually save by intention since changing the document type has
@@ -643,6 +647,19 @@ class PreProcessDocumentEditView(
                     'exception': exception_message
                 }, request=self.request
             )
+
+    def form_valid_comment(self, form):
+        document = self.object
+        user = self.request.user
+        text = form.cleaned_data['text']
+
+        comment = Comment(
+            document=document,
+            user=user,
+            text=text,
+        )
+        comment._event_actor = user
+        comment.save()
 
     def get_form_extra_kwargs__properties(self):
         document = self.get_object()
@@ -802,6 +819,13 @@ class PreProcessDocumentEditView(
                         'form': forms['metadata'],
                         'form_display_mode_table': True,
                         'title': _('Document metadata'),
+                    },
+                },
+                {
+                    'name': 'botech/appearance/generic_form_group_subtemplate.html',
+                    'context': {
+                        'form': forms['comment'],
+                        'title': _('Add optional comment'),
                     },
                 },
             ]
